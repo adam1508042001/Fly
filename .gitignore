@@ -1,0 +1,29 @@
+# Node modules for Vue.js (front-end)
+node_modules/
+
+# Build output for Vue.js (front-end)
+dist/
+build/
+
+# Log files
+*.log
+
+# OS-specific files (macOS, Windows)
+.DS_Store
+Thumbs.db
+
+# Composer dependencies for PHP (back-end)
+vendor/
+
+# PHPUnit result files
+phpunit-result.xml
+phpunit-result.xml.gz
+
+# IDE configurations (VSCode, JetBrains, etc.)
+.idea/
+.vscode/
+
+# .env files for sensitive environment variables
+.env
+.env.local
+.env.*.local
