@@ -8,7 +8,7 @@
 
         <!-- Titre -->
         <div class="text-start mb-6">
-          <h1 class="text-[#0004ff] text-4xl font-bold font-['Inter']">FLY</h1>
+          <h1 class="text-[#ffffff] text-4xl font-bold font-['Inter'] border-white">FLY</h1>
           <h2 class="text-black text-3xl font-bold">Login</h2>
         </div>
 

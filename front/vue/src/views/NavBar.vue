@@ -7,7 +7,7 @@
         src="../assets/logo.jfif" 
         alt="Logo"
       />
-      <div class="brand text-[#0004ff] text-2xl font-bold font-['Inter']">
+      <div class="brand text-[#ffffff] text-2xl font-bold font-['Inter']">
         FLY
       </div>
     </div>
