@@ -42,7 +42,7 @@
           </div>
 
           <!-- Affichage des erreurs -->
-          <div v-if="errors.length" class="mb-4 text-red-500  ">
+          <div v-if="errors.length" class="mb-4 px-5 text-red-700 font-bold bg-white/30 bg-opacity-30 backdrop-blur-md rounded-[10px] ">
             <ul>
               <!-- vfor est faite pour itérer sur l'objet errors et afficher des élement en fonctions de ces données  -->
               <!-- item : un élément dans la liste; :key : Une clé unique (souvent un id ou l'index) qui aide Vue à suivre les éléments lors des mises à jour -->
@@ -69,13 +69,22 @@
         </div>
       </div>
     </div>
+
+   <div id="notification"  v-show="visible"  class="  flex justify-center   m-[30px]">
+    <div class=" h-[60px]  p-[20px] border-4 border-green-600  bg-black  opacity-90  rounded-[30px] flex items-center justify-center   ">
+  <p class=" text-[#228B22] text-[25px]   font-bold  ">formulaire validé, données envoyées </p>
+</div>
+
+   </div>
+
   </div>
+  
+
 </template>
 
 <script setup>
 import { ref } from 'vue';
 import NavBar  from '../views/NavBar.vue';
-
   
   // Variables réactives pour les champs
   
@@ -84,31 +93,61 @@ import NavBar  from '../views/NavBar.vue';
   const errors = ref([]);
 
 
+  // initialisation de la visibikiuté de la notification a false 
+  const visible = ref(false);
 
 
 
     // Méthode pour la validation du formulaire
-    const validation = (e)  => {
+    const validation = async ()  => {
 
       errors.value = []; 
 
 
-      if (email.value && password.value) {
-        alert ('formulaire validé ! '); 
+      if (!email.value && !password.value) {
+    errors.value.push('Email and password must not be empty');
+  } else {
+    // Vérifier si l'email est vide
+    if (!email.value) {
+      errors.value.push('Email must not be empty');
+    }
+
+    // Vérifier si le mot de passe est vide
+    if (!password.value) {
+      errors.value.push('Please enter a password');
+    }
+  }
+
+  // Si il y a des erreurs, on arrête l'exécution
+  if (errors.value.length > 0) {
+    return;
+  }
+
+  // Afficher les données envoyées dans la console
+  console.log('Données envoyées :', {
+    email: email.value,
+    password: password.value,
+  });
+
+
+//affichage de la notification 
+  visible.value = true;
+
+  //pendat 3 secopndes 
+  setTimeout(() => {
+      visible.value = false;
+    }, 3000);
+
+
+    // Réinitialiser les champs après soumission de mon formulaire de co
+    email.value = '';
+    password.value = '';
+
         return true;
-      }
-      
-
-
-      if (!email.value) {
-        errors.value.push('Email must not be empty');
-      }
-      if (!password.value) {
-        errors.value.push('please enter a password');
       }
 
     
-    }
+    
   
 
 </script>
