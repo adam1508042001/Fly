@@ -27,3 +27,6 @@ phpunit-result.xml.gz
 .env
 .env.local
 .env.*.local
+
+# un fichier ou je mets mes mot de passes 
+mdp.txt
