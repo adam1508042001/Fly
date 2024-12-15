@@ -10,7 +10,8 @@
 
 
         <!-- les composants -->
-        <Login />
+        <!-- <Login /> -->
+         <signup />
 
       </div>
     </div>
@@ -18,7 +19,8 @@
 </template>
 
 <script setup>
-import Login from './views/Login.vue';
+// import Login from './views/Login.vue';
+import Signup from './views/Signup.vue';
 </script>
 
 <style scoped>
