@@ -3,27 +3,29 @@
     <!-- Background -->
     <div class="relative w-full h-screen ">
       <!-- Image de fond -->
-      <img 
-        src="./assets/bgimg.webp" 
-        alt="Background Image" 
-        class="absolute top-0 left-0 w-full h-full object-cover "
-      />
+      <img src="./assets/bgimg.webp" alt="Background Image" class="absolute top-0 left-0 w-full h-full object-cover " />
 
       <!-- Contenu principal -->
       <div class="relative z-10">
-        <SignIn />
+
+
+        <!-- les composants -->
+        <Login />
+
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import SignIn from './views/SignIn.vue';
+import Login from './views/Login.vue';
 </script>
 
 <style scoped>
 /* Applique une hauteur correcte */
-html, body, #app {
+html,
+body,
+#app {
   height: 100%;
   margin: 0;
 }

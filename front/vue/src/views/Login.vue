@@ -84,7 +84,7 @@
 
 <script setup>
 import { ref } from 'vue';
-import NavBar  from '../views/NavBar.vue';
+import NavBar  from './NavBar.vue';
   
   // Variables réactives pour les champs
   
