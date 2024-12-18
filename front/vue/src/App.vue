@@ -10,8 +10,10 @@
 
 
         <!-- les composants -->
-        <!-- <Login /> -->
-         <signup />
+        <!-- <Login />  -->
+           <signup />  
+        <!-- <Search />  -->
+
 
       </div>
     </div>
@@ -19,8 +21,9 @@
 </template>
 
 <script setup>
-// import Login from './views/Login.vue';
-import Signup from './views/Signup.vue';
+//  import Login from './views/Login.vue';
+ import Signup from './views/Signup.vue';
+  // import Search from './views/Search.vue';
 </script>
 
 <style scoped>

@@ -1,10 +1,10 @@
 <template>
-  <div class="flex flex-col min-h-screen">
+  <div class="flex flex-col min-h-screen bg-black bg-opacity-50">
     <!-- Navbar -->
     <NavBar />
 
-    <div class="flex items-center justify-center flex-grow bg-cover bg-center">
-      <div class="bg-black bg-opacity-65 p-8 rounded-[40px] shadow-lg w-[600px]">
+    <div class="flex items-center  justify-center flex-grow bg-cover bg-center">
+      <div class="bg-white    backdrop-blur-[2px] bg-opacity-30 p-8 rounded-[40px] shadow-lg w-[600px]">
         <!-- Titre -->
         <div class="text-start mb-6">
           <h1 class="text-[#ffffff] text-4xl font-bold font-['Inter'] border-white">FLY</h1>

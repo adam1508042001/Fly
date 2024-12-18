@@ -1,5 +1,5 @@
 <template>
-  <div class="NavBar bg-black bg-opacity-25    my-4 mx-[300px] py-3 px-6   rounded-[60px] flex items-center justify-between  ">
+  <div class="NavBar bg-white bg-opacity-25    my-4 mx-[300px] py-3 px-6   rounded-[60px] flex items-center justify-between  ">
     <!-- Logo -->
     <div class="flex items-center gap-4">
       <img 
