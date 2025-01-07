@@ -9,6 +9,10 @@ class Airport extends Model
 {
     use HasFactory;
 
+     // Clé primaire personnalisée
+     protected $primaryKey = 'id_airport';
+    
+
     protected $fillable = [
         'name',
         'city',
