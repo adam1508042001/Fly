@@ -1,0 +1,82 @@
+--le fichier de creation de base de données nommee fly
+
+-- Création de la base de données
+CREATE DATABASE fly;
+USE fly;
+
+-- Table: airport
+CREATE TABLE airport (
+    id_airport INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    city VARCHAR(255) NOT NULL
+);
+
+
+CREATE TABLE runway (
+    id_runway INT AUTO_INCREMENT PRIMARY KEY,
+    id_airport INT NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    size INT NOT NULL,
+    state VARCHAR(50) NOT NULL,
+    FOREIGN KEY (id_airport) REFERENCES airport(id_airport)
+);
+
+
+CREATE TABLE client (
+    id_client INT AUTO_INCREMENT PRIMARY KEY,
+    first_name VARCHAR(255) NOT NULL,
+    last_name VARCHAR(255) NOT NULL,
+    date_of_birth DATE NOT NULL,
+    email VARCHAR(255),
+    status VARCHAR(50)
+);
+
+
+CREATE TABLE plane (
+    id_plane INT AUTO_INCREMENT PRIMARY KEY,
+    model VARCHAR(255) NOT NULL,
+    size INT NOT NULL,
+    max_place INT NOT NULL,
+    state VARCHAR(50) NOT NULL
+);
+
+
+CREATE TABLE fly (
+    id_fly INT AUTO_INCREMENT PRIMARY KEY,
+    date_hour_take_off DATETIME NOT NULL,
+    date_hour_landing DATETIME NOT NULL,
+    state VARCHAR(50),
+    id_airport_take_off INT NOT NULL,
+    id_airport_landing INT NOT NULL,
+    id_plane INT NOT NULL,
+    FOREIGN KEY (id_airport_take_off) REFERENCES airport(id_airport),
+    FOREIGN KEY (id_airport_landing) REFERENCES airport(id_airport),
+    FOREIGN KEY (id_plane) REFERENCES plane(id_plane)
+);
+
+CREATE TABLE booking (
+    id_booking INT AUTO_INCREMENT PRIMARY KEY,
+    id_client INT NOT NULL,
+    id_fly INT NOT NULL,
+    date_hour DATETIME NOT NULL,
+    place_reserved INT NOT NULL,
+    state VARCHAR(50) NOT NULL,
+    suitcase_authorized INT NOT NULL,
+    weight_authorized DECIMAL(10, 2) NOT NULL,
+    FOREIGN KEY (id_client) REFERENCES client(id_client),
+    FOREIGN KEY (id_fly) REFERENCES fly(id_fly)
+);
+
+
+CREATE TABLE serve (
+    id_airport INT NOT NULL,
+    id_fly INT NOT NULL,
+    PRIMARY KEY (id_airport, id_fly),
+    FOREIGN KEY (id_airport) REFERENCES airport(id_airport),
+    FOREIGN KEY (id_fly) REFERENCES fly(id_fly)
+);
+
+
+
+
+
