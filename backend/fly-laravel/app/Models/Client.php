@@ -5,15 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Plane extends Model
+class Client extends Model
 {
     use HasFactory;
 
-
     protected $fillable = [
-        'model',
-        'size',
-        'max_place',
-        'state',
+        'first_name',
+        'last_name',
+        'date_of_birth',
+        'email',
+        'status',
     ];
 }

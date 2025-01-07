@@ -5,15 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Plane extends Model
+class Airport extends Model
 {
     use HasFactory;
 
-
     protected $fillable = [
-        'model',
-        'size',
-        'max_place',
-        'state',
+        'name',
+        'city',
     ];
 }
