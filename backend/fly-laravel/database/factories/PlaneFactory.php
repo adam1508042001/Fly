@@ -24,7 +24,6 @@ class PlaneFactory extends Factory
             'size' => $this->faker->numberBetween(10, 100),  // Taille de l'avion aléatoire
             'max_place' => $this->faker->numberBetween(50, 300),  // Nombre de places maximum aléatoire
             'state' => $this->faker->randomElement(['available', 'maintenance', 'unavailable']),  // État aléatoire
-            'id_runway' => $this->faker->numberBetween(1, 20),  // Piste aléatoire
         ];
     }
 }
