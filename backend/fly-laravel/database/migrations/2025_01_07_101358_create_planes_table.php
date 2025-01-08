@@ -17,6 +17,7 @@ return new class extends Migration
                 $table->integer('size');
                 $table->integer('max_place');
                 $table->string('state');
+                $table->foreign('id_runway')->references('id_runway')->on('runways')->onDelete('cascade');
                 $table->timestamps();
             });
         
