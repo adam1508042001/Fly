@@ -64,8 +64,9 @@
 
         <!-- Lien pour s'inscrire -->
         <div class="   text-center text-[16px] text-white ">
-          <p>Don’t have an account yet? 
-          <a href="/register" class="text-[#ffffff] font-bold underline">Register for free</a></p>
+          <p>Don’t have an account yet?
+            <router-link to="/signup" class="text-[#ffffff] font-bold underline">Register for free</router-link>
+          </p>
         </div>
       </div>
     </div>
@@ -144,12 +145,7 @@ import NavBar  from './NavBar.vue';
     password.value = '';
 
         return true;
-      }
-
-    
-    
-  
-
+      };
 </script>
 
 <style>
