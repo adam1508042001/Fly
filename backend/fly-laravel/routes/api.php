@@ -48,3 +48,16 @@ Route::prefix('runways')->group(function () {
     Route::patch('/{id_runway}', [RunwayController::class, 'partialUpdate']); // Mise à jour partielle
 });
 
+
+
+
+use App\Http\Controllers\Api\ClientController;
+
+Route::prefix('clients')->group(function () {
+    Route::get('/', [ClientController::class, 'index']); // Liste tous les clients
+    Route::post('/', [ClientController::class, 'store']); // Crée un nouveau client
+    Route::get('/{id_client}', [ClientController::class, 'show']); // Affiche un client spécifique
+    Route::put('/{id_client}', [ClientController::class, 'update']); // Met à jour un client
+    Route::patch('/{id_client}', [ClientController::class, 'partialUpdate']); // Mise à jour partielle
+    Route::delete('/{id_client}', [ClientController::class, 'destroy']); // Supprime un client
+});
