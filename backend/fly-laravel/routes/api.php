@@ -4,6 +4,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PlaneController;
 use App\Http\Controllers\AirportController;
+use App\Http\Controllers\Api\ClientController;
+use App\Http\Controllers\Api\BookingController;
+use App\Http\Controllers\Api\RunwayController;
 
 
 Route::get('planes', [PlaneController::class, 'index']); // Récupérer toutes les avions
@@ -37,7 +40,7 @@ Route::patch('{id_airport}', [AirportController::class, 'patch']);
 });
 
 
-use App\Http\Controllers\Api\RunwayController;
+
 
 Route::prefix('runways')->group(function () {
     Route::get('/', [RunwayController::class, 'index']); // Liste tous les runways
@@ -51,7 +54,7 @@ Route::prefix('runways')->group(function () {
 
 
 
-use App\Http\Controllers\Api\ClientController;
+
 
 Route::prefix('clients')->group(function () {
     Route::get('/', [ClientController::class, 'index']); // Liste tous les clients
@@ -60,4 +63,16 @@ Route::prefix('clients')->group(function () {
     Route::put('/{id_client}', [ClientController::class, 'update']); // Met à jour un client
     Route::patch('/{id_client}', [ClientController::class, 'partialUpdate']); // Mise à jour partielle
     Route::delete('/{id_client}', [ClientController::class, 'destroy']); // Supprime un client
+});
+
+
+
+
+Route::prefix('bookings')->group(function () {
+    Route::get('/', [BookingController::class, 'index']); // Liste toutes les réservations
+    Route::post('/', [BookingController::class, 'store']); // Crée une nouvelle réservation
+    Route::get('/{id_booking}', [BookingController::class, 'show']); // Affiche une réservation spécifique
+    Route::put('/{id_booking}', [BookingController::class, 'update']); // Met à jour une réservation
+    Route::patch('/{id_booking}', [BookingController::class, 'partialUpdate']); // Mise à jour partielle
+    Route::delete('/{id_booking}', [BookingController::class, 'destroy']); // Supprime une réservation
 });
