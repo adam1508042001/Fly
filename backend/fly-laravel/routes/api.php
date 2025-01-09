@@ -36,3 +36,15 @@ Route::patch('{id_airport}', [AirportController::class, 'patch']);
 
 });
 
+
+use App\Http\Controllers\Api\RunwayController;
+
+Route::prefix('runways')->group(function () {
+    Route::get('/', [RunwayController::class, 'index']); // Liste tous les runways
+    Route::post('/', [RunwayController::class, 'store']); // Enregistre un nouveau runway
+    Route::get('/{id_runway}', [RunwayController::class, 'show']); // Affiche un runway spécifique
+    Route::put('/{id_runway}', [RunwayController::class, 'update']); // Met à jour un runway
+    Route::delete('/{id_runway}', [RunwayController::class, 'destroy']); // Supprime un runway
+    Route::patch('/{id_runway}', [RunwayController::class, 'partialUpdate']); // Mise à jour partielle
+});
+

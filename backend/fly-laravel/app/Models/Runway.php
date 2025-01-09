@@ -9,15 +9,11 @@ class Runway extends Model
 {
     use HasFactory;
 
+    protected $primaryKey = 'id_runway';
+
     protected $fillable = [
         'state',
         'size',
         'id_airport',
     ];
-
-    // Relation avec l'aéroport
-    public function airport()
-    {
-        return $this->belongsTo(Airport::class, 'id_airport');
-    }
 }
