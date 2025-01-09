@@ -9,6 +9,8 @@ class Booking extends Model
 {
     use HasFactory;
 
+    protected $primaryKey = 'id_booking';
+
     protected $fillable = [
         'date_hour',
         'place_reserved',
@@ -18,16 +20,4 @@ class Booking extends Model
         'id_fly',
         'id_client',
     ];
-
-    // Relation avec le vol
-    public function fly()
-    {
-        return $this->belongsTo(Fly::class, 'id_fly');
-    }
-
-    // Relation avec le client
-    public function client()
-    {
-        return $this->belongsTo(Client::class, 'id_client');
-    }
 }
