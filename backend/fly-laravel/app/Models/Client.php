@@ -9,6 +9,8 @@ class Client extends Model
 {
     use HasFactory;
 
+    protected $primaryKey = 'id_client';
+
     protected $fillable = [
         'first_name',
         'last_name',
