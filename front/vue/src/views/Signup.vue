@@ -102,11 +102,16 @@
       </div>
     </div>
   </div>
+
+  <div>
+    <p v-for="(user in users)" :key="user.client_id">{{ user.first_name }}</p>
+  </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue';
 import NavBar from './NavBar.vue';
+import axios from 'axios';
 
 // Variables réactives pour les champs
 const firstname = ref('');
@@ -175,6 +180,21 @@ const validation = async () => {
     password.value = '';
   }
 };
+
+// Utilisateurs
+async function register() {
+  try {
+    const response = await axios.post('http://localhost:8000/api/clients');
+    return response.data;
+  }
+  catch (error) {
+    console.error(error);
+  }
+}
+
+onMounted(async () => {
+  users.value = await getUsers();
+});
 </script>
 
 <style>

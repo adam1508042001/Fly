@@ -16,6 +16,7 @@ class Client extends Model
         'last_name',
         'date_of_birth',
         'email',
+        'password',
         'status',
     ];
 }

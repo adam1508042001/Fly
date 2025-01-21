@@ -21,6 +21,7 @@ class ClientFactory extends Factory
             'last_name' => $this->faker->lastName,    // Nom de famille du client
             'date_of_birth' => $this->faker->date,    // Date de naissance du client
             'email' => $this->faker->unique()->safeEmail,  // Email unique
+            'password' => $this->faker->password,     // Mot de passe du client
             'status' => $this->faker->randomElement(['active', 'inactive', 'pending']), // Statut du client
         ];
     }
