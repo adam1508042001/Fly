@@ -141,6 +141,7 @@
 </template>
 
 <script>
+import axios from 'axios';
 import NavBar from './NavBar.vue';
 import Reservation from './Reservation.vue';
 
@@ -247,11 +248,15 @@ export default {
 		this.sortOrder = this.sortOrder === 'asc' ? 'desc' : 'asc';
 	},
 	async searchFlights() {
-		const allFlights = await getFlights();
-		this.flights = allFlights.filter(flight => {
-			return flight.airport_fly_off.city.toLowerCase().includes(this.departureQuery.toLowerCase()) &&
-				   flight.airport_landing.city.toLowerCase().includes(this.arrivalQuery.toLowerCase());
-		});
+		try {
+			const response = await axios.get('http://127.0.0.1:8000/api/filghts');
+			this.flights = response.data.filter(flight => {
+				return flight.airport_fly_off.city.toLowerCase().includes(this.departureQuery.toLowerCase()) &&
+					   flight.airport_landing.city.toLowerCase().includes(this.arrivalQuery.toLowerCase());
+			});
+		} catch (error) {
+			console.error('Erreur lors de la récupération des vols:', error);
+		}
 	},
 	openModal(price) {
 		this.selectedPrice = price;
@@ -262,16 +267,9 @@ export default {
 	}
   },
   async mounted() {
-	this.flights = await getFlights();
+	this.searchFlights();
   }
 };
-
-async function getFlights() {
-  const response = await fetch('http://127.0.0.1:8000/api/flys');
-  const data = await response.json();
-  return data;
-}
-
 </script>
 
 
