@@ -131,18 +131,23 @@
 						>
 							{{ formatStatus(flight.status) }}
 						</div>
+						<button @click="openModal(flight.price)">Réserver</button>
 					</div>
 				</div>
 			</div>
 		</div>
+		<Reservation v-if="showModal" :price="selectedPrice" @close="closeModal" />
 	</div>
 </template>
 
 <script>
 import NavBar from './NavBar.vue';
+import Reservation from './Reservation.vue';
+
 export default {
   components: {
-	NavBar
+	NavBar,
+	Reservation
   },
   data() {
 	return {
@@ -154,7 +159,9 @@ export default {
 		filteredArrivalFlights: [],
 		sortBy: 'price',
 		sortOrder: 'asc',
-	  	flights: []
+	  	flights: [],
+		showModal: false,
+		selectedPrice: 0
 	};
   },
   computed: {
@@ -245,6 +252,13 @@ export default {
 			return flight.airport_fly_off.city.toLowerCase().includes(this.departureQuery.toLowerCase()) &&
 				   flight.airport_landing.city.toLowerCase().includes(this.arrivalQuery.toLowerCase());
 		});
+	},
+	openModal(price) {
+		this.selectedPrice = price;
+		this.showModal = true;
+	},
+	closeModal() {
+		this.showModal = false;
 	}
   },
   async mounted() {

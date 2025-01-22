@@ -13,7 +13,7 @@ use App\Http\Controllers\Auth\AuthController;
 Route::prefix('auth')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
-    Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']); // Correction ici
+    Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
 });
 
 Route::prefix('planes')->group(function () {
@@ -61,4 +61,4 @@ Route::prefix('bookings')->group(function () {
     Route::delete('/{id_booking}', [BookingController::class, 'destroy']);
 });
 
-Route::middleware('auth:sanctum')->get('/send-mail', [MailController::class, 'sendMail']);
+Route::middleware('auth:sanctum')->post('/send-confirmation-email', [MailController::class, 'sendConfirmationEmail']);
