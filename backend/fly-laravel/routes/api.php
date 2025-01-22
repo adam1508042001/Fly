@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\ClientController;
 use App\Http\Controllers\Api\BookingController;
 use App\Http\Controllers\Api\RunwayController;
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Api\FlyController;
 
 Route::prefix('auth')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
@@ -59,3 +60,23 @@ Route::prefix('bookings')->group(function () {
     Route::patch('/{id_booking}', [BookingController::class, 'partialUpdate']); // Mise à jour partielle
     Route::delete('/{id_booking}', [BookingController::class, 'destroy']); // Supprime une réservation
 });
+
+
+
+
+// Liste tous les vols
+Route::get('/flies', [FlyController::class, 'index']);
+
+// Crée un vol (planification)
+Route::post('/flies', [FlyController::class, 'store']);
+
+// Détails d'un vol spécifique
+Route::get('/flies/{id}', [FlyController::class, 'show']);
+
+// Met à jour un vol
+Route::put('/flies/{id}', [FlyController::class, 'update']);
+
+// Supprime un vol
+Route::delete('/flies/{id}', [FlyController::class, 'destroy']);
+
+Route::post('/flies/{id}/cancel', [FlyController::class, 'cancel']);
