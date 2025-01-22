@@ -4,7 +4,7 @@ import Signup from '../views/Signup.vue'
 import SearchFly from '../views/SearchFly.vue'
 
 const routes = [
-  { path: '/', redirect: '/login' },
+  { path: '/', redirect: '/search' },
   { path: '/login', component: Login },
   { path: '/signup', component: Signup },
   { path: '/search', component: SearchFly }

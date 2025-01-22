@@ -85,7 +85,8 @@
           <!-- Bouton de connexion -->
           <div class="mb-4">
             <button
-              type="submit"
+              type="button"
+              @click="register"
               class="w-full bg-[#0004ff] text-white py-2 rounded-full font-bold hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-300 transition-all"
             >
               Sign Up
@@ -101,10 +102,6 @@
         <p class="text-[#228B22] text-[25px] font-bold">Bien enregistré</p>
       </div>
     </div>
-  </div>
-
-  <div>
-    <p v-for="(user in users)" :key="user.client_id">{{ user.first_name }}</p>
   </div>
 </template>
 
@@ -184,17 +181,19 @@ const validation = async () => {
 // Utilisateurs
 async function register() {
   try {
-    const response = await axios.post('http://localhost:8000/api/clients');
+    const response = await axios.post('http://localhost:8000/api/clients', {
+      firstname: firstname.value,
+      lastname: lastname.value,
+      dob: dob.value,
+      email: email.value,
+      password: password.value,
+    });
     return response.data;
-  }
-  catch (error) {
+  } catch (error) {
     console.error(error);
+    errors.value.push('An error occurred while registering. Please try again.');
   }
 }
-
-onMounted(async () => {
-  users.value = await getUsers();
-});
 </script>
 
 <style>
