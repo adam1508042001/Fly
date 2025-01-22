@@ -1,8 +1,0 @@
-
-1- creation de base de données flybdd 
-2- test de la creation avec php artisan tinker 
-avec la ligne de commande 
-DB::connection()->getPdo();
-
-3- creation de données factices avec factory : fichiers touchés (les fichiers dans le dossier database/seeders , les fichiers dans database/factories , les fichiers dans app/models)
-
