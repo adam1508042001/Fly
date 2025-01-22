@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\AirportController;
 use App\Http\Controllers\Api\ClientController;
 use App\Http\Controllers\Api\BookingController;
 use App\Http\Controllers\Api\RunwayController;
+use App\Http\Controllers\Api\MailController;
 use App\Http\Controllers\Auth\AuthController;
 
 Route::prefix('auth')->group(function () {
@@ -43,19 +44,21 @@ Route::prefix('runways')->group(function () {
 });
 
 Route::prefix('clients')->group(function () {
-    Route::get('/', [ClientController::class, 'index']); // Liste tous les clients
-    Route::post('/', [ClientController::class, 'store']); // Crée un nouveau client
-    Route::get('/{id_client}', [ClientController::class, 'show']); // Affiche un client spécifique
-    Route::put('/{id_client}', [ClientController::class, 'update']); // Met à jour un client
-    Route::patch('/{id_client}', [ClientController::class, 'partialUpdate']); // Mise à jour partielle
-    Route::delete('/{id_client}', [ClientController::class, 'destroy']); // Supprime un client
+    Route::get('/', [ClientController::class, 'index']);
+    Route::post('/', [ClientController::class, 'store']);
+    Route::get('/{id_client}', [ClientController::class, 'show']);
+    Route::put('/{id_client}', [ClientController::class, 'update']);
+    Route::patch('/{id_client}', [ClientController::class, 'partialUpdate']);
+    Route::delete('/{id_client}', [ClientController::class, 'destroy']);
 });
 
 Route::prefix('bookings')->group(function () {
-    Route::get('/', [BookingController::class, 'index']); // Liste toutes les réservations
-    Route::post('/', [BookingController::class, 'store']); // Crée une nouvelle réservation
-    Route::get('/{id_booking}', [BookingController::class, 'show']); // Affiche une réservation spécifique
-    Route::put('/{id_booking}', [BookingController::class, 'update']); // Met à jour une réservation
-    Route::patch('/{id_booking}', [BookingController::class, 'partialUpdate']); // Mise à jour partielle
-    Route::delete('/{id_booking}', [BookingController::class, 'destroy']); // Supprime une réservation
+    Route::get('/', [BookingController::class, 'index']);
+    Route::post('/', [BookingController::class, 'store']);
+    Route::get('/{id_booking}', [BookingController::class, 'show']);
+    Route::put('/{id_booking}', [BookingController::class, 'update']);
+    Route::patch('/{id_booking}', [BookingController::class, 'partialUpdate']);
+    Route::delete('/{id_booking}', [BookingController::class, 'destroy']);
 });
+
+Route::middleware('auth:sanctum')->get('/send-mail', [MailController::class, 'sendMail']);
