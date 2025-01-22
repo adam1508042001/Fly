@@ -13,12 +13,10 @@
         </div>
 
         <!-- Formulaire -->
-         <!-- @submit.prevent pour ne pas   recharger  la page pour pouvoir gérer le formualire  -->
-        <form  @submit.prevent="validation" >
+        <form @submit.prevent="login">
           <!-- Email -->
-          <div  class="mb-4">
-            <label for="email" class="block  font-bold text-white">Email</label>
-            <!-- j'ajoute des variablmes reactives pour stocker les valeurs  avec id -->
+          <div class="mb-4">
+            <label for="email" class="block font-bold text-white">Email</label>
             <input
               type="email"
               id="email"
@@ -33,7 +31,6 @@
             <label for="password" class="block font-bold text-white">Password</label>
             <input
               type="password"
-
               id="password"
               v-model="password"
               placeholder="user password"
@@ -70,14 +67,6 @@
         </div>
       </div>
     </div>
-
-   <div id="notification"  v-show="visible"  class="  flex justify-center   m-[30px]">
-    <div class=" h-[60px]  p-[20px] border-4 border-green-600  bg-black  opacity-90  rounded-[30px] flex items-center justify-center   ">
-  <p class=" text-[#228B22] text-[25px]   font-bold  ">formulaire validé, données envoyées </p>
-</div>
-
-   </div>
-
   </div>
   
 
@@ -85,6 +74,8 @@
 
 <script setup>
 import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import axios from 'axios';
 import NavBar  from './NavBar.vue';
   
   // Variables réactives pour les champs
@@ -96,11 +87,12 @@ import NavBar  from './NavBar.vue';
 
   // initialisation de la visibikiuté de la notification a false 
   const visible = ref(false);
+  const router = useRouter();
 
 
 
     // Méthode pour la validation du formulaire
-    const validation = async ()  => {
+    const login = async ()  => {
 
       errors.value = []; 
 
@@ -124,28 +116,27 @@ import NavBar  from './NavBar.vue';
     return;
   }
 
-  // Afficher les données envoyées dans la console
-  console.log('Données envoyées :', {
-    email: email.value,
-    password: password.value,
-  });
+  try {
+    const response = await axios.post('http://127.0.0.1:8000/api/auth/login', {
+      email: email.value,
+      password: password.value
+    });
 
+    console.log('Login successful:', response.data);
 
-//affichage de la notification 
-  visible.value = true;
+    // Stocker le token dans le localStorage
+    localStorage.setItem('token', response.data.access_token);
 
-  //pendat 3 secopndes 
-  setTimeout(() => {
-      visible.value = false;
-    }, 3000);
+    router.push('/search');
 
-
-    // Réinitialiser les champs après soumission de mon formulaire de co
+    // Réinitialiser les champs après soumission du formulaire
     email.value = '';
     password.value = '';
-
-        return true;
-      };
+  } catch (error) {
+    console.error('Login failed:', error.response.data);
+    errors.value.push('Login failed: ' + error.response.data.message);
+  }
+};
 </script>
 
 <style>

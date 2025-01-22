@@ -23,7 +23,7 @@ class AuthController extends Controller
             ], 401);
         }
 
-        $client = Auth::client();
+        $client = Auth::user();
         $token = $client->createToken('auth_token')->plainTextToken;
 
         return response()->json([
@@ -42,7 +42,7 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        $request->client()->currentAccessToken()->delete();
+        $request->user()->currentAccessToken()->delete();
 
         return response()->json([
             'message' => 'Token supprimé'
@@ -51,6 +51,9 @@ class AuthController extends Controller
 
     public function register(RegisterRequest $request)
     {
+        Log::info('register method called');
+        Log::info('Request data:', $request->all());
+
         $validated = $request->validated();
 
         Log::info('Validated data:', $validated);
