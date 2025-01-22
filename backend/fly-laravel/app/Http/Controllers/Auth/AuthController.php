@@ -51,6 +51,9 @@ class AuthController extends Controller
 
     public function register(RegisterRequest $request)
     {
+        Log::info('register method called');
+        Log::info('Request data:', $request->all());
+
         $validated = $request->validated();
 
         Log::info('Validated data:', $validated);

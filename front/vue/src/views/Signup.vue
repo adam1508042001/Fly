@@ -12,15 +12,14 @@
         </div>
 
         <!-- Formulaire -->
-        <!-- @submit.prevent pour ne pas recharger la page -->
-        <form @submit.prevent="validation">
+        <form @submit.prevent="register">
           <!-- Firstname -->
           <div class="mb-4">
-            <label for="firstname" class="block font-bold text-white">First Name</label>
+            <label for="first_name" class="block font-bold text-white">First Name</label>
             <input
               type="text"
-              id="firstname"
-              v-model="firstname"
+              id="first_name"
+              v-model="first_name"
               placeholder="First name"
               class="mt-1 block w-full px-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring focus:ring-blue-500 focus:border-blue-500 shadow-sm"
             />
@@ -28,11 +27,11 @@
 
           <!-- Lastname -->
           <div class="mb-4">
-            <label for="lastname" class="block font-bold text-white">Last Name</label>
+            <label for="last_name" class="block font-bold text-white">Last Name</label>
             <input
               type="text"
-              id="lastname"
-              v-model="lastname"
+              id="last_name"
+              v-model="last_name"
               placeholder="Last name"
               class="mt-1 block w-full px-4 py-1 rounded-full border border-gray-300 focus:outline-none focus:ring focus:ring-blue-500 focus:border-blue-500 shadow-sm"
             />
@@ -40,13 +39,13 @@
 
           <!-- Date Of Birth -->
           <div class="mb-4">
-            <label for="dob" class="block font-bold text-white">Date Of Birth</label>
+            <label for="date_of_birth" class="block font-bold text-white">Date Of Birth</label>
             <input
               type="date"
-              id="dob"
+              id="date_of_birth"
               min="1800-01-01"
               :max="maxDob"
-              v-model="dob"
+              v-model="date_of_birth"
               class="mt-1 block w-full px-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring focus:ring-blue-500 focus:border-blue-500 shadow-sm"
             />
           </div>
@@ -85,8 +84,7 @@
           <!-- Bouton de connexion -->
           <div class="mb-4">
             <button
-              type="button"
-              @click="register"
+              type="submit"
               class="w-full bg-[#0004ff] text-white py-2 rounded-full font-bold hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-300 transition-all"
             >
               Sign Up
@@ -107,17 +105,19 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 import NavBar from './NavBar.vue';
 import axios from 'axios';
 
 // Variables réactives pour les champs
-const firstname = ref('');
-const lastname = ref('');
-const dob = ref('');
+const first_name = ref('');
+const last_name = ref('');
+const date_of_birth = ref('');
 const email = ref('');
 const password = ref('');
 const errors = ref([]);
 const visible = ref(false);
+const router = useRouter();
 
 // Valeur dynamique pour la date maximale
 const maxDob = ref('');
@@ -134,7 +134,7 @@ onMounted(() => {
 const validation = async () => {
   errors.value = [];
 
-  if (!email.value && !password.value && !firstname.value && !lastname.value && !dob.value) {
+  if (!email.value && !password.value && !first_name.value && !last_name.value && !date_of_birth.value) {
     errors.value.push('You have to put all informations please!');
   } else {
     if (!email.value) {
@@ -143,24 +143,24 @@ const validation = async () => {
     if (!password.value) {
       errors.value.push('Please enter a password');
     }
-    if (!firstname.value) {
+    if (!first_name.value) {
       errors.value.push('First name must not be empty');
     }
-    if (!lastname.value) {
+    if (!last_name.value) {
       errors.value.push('Last name must not be empty');
     }
-    if (!dob.value) {
+    if (!date_of_birth.value) {
       errors.value.push('Date of birth must not be empty');
     }
 
     if (errors.value.length > 0) return;
 
     console.log('Données envoyées :', {
-      Firstname: firstname.value,
-      Lastname: lastname.value,
-      DateOfBirth: dob.value,
-      Email: email.value,
-      Password: password.value,
+      first_name: first_name.value,
+      last_name: last_name.value,
+      date_of_birth: date_of_birth.value,
+      email: email.value,
+      password: password.value,
     });
 
     visible.value = true;
@@ -169,9 +169,10 @@ const validation = async () => {
       visible.value = false;
     }, 3000);
 
-    firstname.value = '';
-    lastname.value = '';
-    dob.value = '';
+    // Réinitialiser les champs après soumission
+    first_name.value = '';
+    last_name.value = '';
+    date_of_birth.value = '';
     email.value = '';
     password.value = '';
   }
@@ -180,13 +181,16 @@ const validation = async () => {
 // Utilisateurs
 async function register() {
   try {
-    const response = await axios.post('http://localhost:8000/api/clients', {
-      firstname: firstname.value,
-      lastname: lastname.value,
-      dob: dob.value,
+    const response = await axios.post('http://localhost:8000/api/auth/register', {
+      first_name: first_name.value,
+      last_name: last_name.value,
+      date_of_birth: date_of_birth.value,
       email: email.value,
       password: password.value,
     });
+
+    router.push('/login');
+
     return response.data;
   } catch (error) {
     console.error(error);
