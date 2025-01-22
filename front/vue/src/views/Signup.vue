@@ -169,7 +169,6 @@ const validation = async () => {
       visible.value = false;
     }, 3000);
 
-    // Réinitialiser les champs après soumission
     firstname.value = '';
     lastname.value = '';
     dob.value = '';
