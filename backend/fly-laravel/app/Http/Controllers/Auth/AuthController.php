@@ -23,7 +23,7 @@ class AuthController extends Controller
             ], 401);
         }
 
-        $client = Auth::user(); 
+        $client = Auth::client();
         $token = $client->createToken('auth_token')->plainTextToken;
 
         return response()->json([
@@ -42,7 +42,7 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        $request->user()->currentAccessToken()->delete();
+        $request->client()->currentAccessToken()->delete();
 
         return response()->json([
             'message' => 'Token supprimé'
