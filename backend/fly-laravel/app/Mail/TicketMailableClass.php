@@ -29,7 +29,7 @@ class TicketMailableClass extends Mailable
      */
     public function build()
     {
-        return $this->subject('Subject test of the email')
+        return $this->subject('Subject of the email')
                     ->view('emails.ticket_mailable_view');
     }
 }
