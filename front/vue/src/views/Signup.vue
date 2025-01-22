@@ -4,7 +4,7 @@
     <NavBar />
 
     <div class="flex items-center justify-center flex-grow bg-cover bg-center">
-      <div class="bg-black bg-opacity-65 p-8 rounded-[40px] shadow-lg w-[600px]">
+      <div class="bg-black bg-opacity-65 p-6 rounded-[40px] shadow-lg w-[600px]">
         <!-- Titre -->
         <div class="text-start mb-6">
           <h1 class="text-[#ffffff] text-4xl font-bold font-['Inter'] border-white">FLY</h1>
@@ -15,31 +15,31 @@
         <!-- @submit.prevent pour ne pas recharger la page -->
         <form @submit.prevent="validation">
           <!-- Firstname -->
-          <div class="mb-6">
+          <div class="mb-4">
             <label for="firstname" class="block font-bold text-white">First Name</label>
             <input
               type="text"
               id="firstname"
               v-model="firstname"
-              placeholder="User first name"
+              placeholder="First name"
               class="mt-1 block w-full px-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring focus:ring-blue-500 focus:border-blue-500 shadow-sm"
             />
           </div>
 
           <!-- Lastname -->
-          <div class="mb-6">
+          <div class="mb-4">
             <label for="lastname" class="block font-bold text-white">Last Name</label>
             <input
               type="text"
               id="lastname"
               v-model="lastname"
-              placeholder="User last name"
-              class="mt-1 block w-full px-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring focus:ring-blue-500 focus:border-blue-500 shadow-sm"
+              placeholder="Last name"
+              class="mt-1 block w-full px-4 py-1 rounded-full border border-gray-300 focus:outline-none focus:ring focus:ring-blue-500 focus:border-blue-500 shadow-sm"
             />
           </div>
 
           <!-- Date Of Birth -->
-          <div class="mb-6">
+          <div class="mb-4">
             <label for="dob" class="block font-bold text-white">Date Of Birth</label>
             <input
               type="date"
@@ -58,19 +58,19 @@
               type="email"
               id="email"
               v-model="email"
-              placeholder="username@gmail.com"
+              placeholder="example@gmail.com"
               class="mt-1 block w-full px-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring focus:ring-blue-500 focus:border-blue-500 shadow-sm"
             />
           </div>
 
           <!-- Password -->
-          <div class="mb-6">
+          <div class="mb-4">
             <label for="password" class="block font-bold text-white">Password</label>
             <input
               type="password"
               id="password"
               v-model="password"
-              placeholder="User password"
+              placeholder="Password"
               class="mt-1 block w-full px-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring focus:ring-blue-500 focus:border-blue-500 shadow-sm"
             />
           </div>
@@ -102,11 +102,16 @@
       </div>
     </div>
   </div>
+
+  <div>
+    <p v-for="(user in users)" :key="user.client_id">{{ user.first_name }}</p>
+  </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue';
 import NavBar from './NavBar.vue';
+import axios from 'axios';
 
 // Variables réactives pour les champs
 const firstname = ref('');
@@ -175,6 +180,21 @@ const validation = async () => {
     password.value = '';
   }
 };
+
+// Utilisateurs
+async function register() {
+  try {
+    const response = await axios.post('http://localhost:8000/api/clients');
+    return response.data;
+  }
+  catch (error) {
+    console.error(error);
+  }
+}
+
+onMounted(async () => {
+  users.value = await getUsers();
+});
 </script>
 
 <style>
