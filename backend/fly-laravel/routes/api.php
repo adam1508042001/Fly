@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\BookingController;
 use App\Http\Controllers\Api\RunwayController;
 use App\Http\Controllers\Api\MailController;
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Api\FlyController;
 
 Route::prefix('auth')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
@@ -52,13 +53,36 @@ Route::prefix('clients')->group(function () {
     Route::delete('/{id_client}', [ClientController::class, 'destroy']);
 });
 
+
+
+
+
 Route::prefix('bookings')->group(function () {
-    Route::get('/', [BookingController::class, 'index']);
-    Route::post('/', [BookingController::class, 'store']);
-    Route::get('/{id_booking}', [BookingController::class, 'show']);
-    Route::put('/{id_booking}', [BookingController::class, 'update']);
-    Route::patch('/{id_booking}', [BookingController::class, 'partialUpdate']);
-    Route::delete('/{id_booking}', [BookingController::class, 'destroy']);
+
+    Route::get('/', [BookingController::class, 'index']); // Liste toutes les réservations
+    Route::post('/', [BookingController::class, 'store']); // Crée une nouvelle réservation
+    Route::get('/{id_booking}', [BookingController::class, 'show']); // Affiche une réservation spécifique
+    Route::put('/{id_booking}', [BookingController::class, 'update']); // Met à jour une réservation
+    Route::patch('/{id_booking}', [BookingController::class, 'partialUpdate']); // Mise à jour partielle
+    Route::delete('/{id_booking}', [BookingController::class, 'destroy']); // Supprime une réservation
 });
 
-Route::middleware('auth:sanctum')->post('/send-confirmation-email', [MailController::class, 'sendConfirmationEmail']);
+
+
+
+// Liste tous les vols
+Route::get('/flies', [FlyController::class, 'index']);
+
+// Crée un vol (planification)
+Route::post('/flies', [FlyController::class, 'store']);
+
+// Détails d'un vol spécifique
+Route::get('/flies/{id}', [FlyController::class, 'show']);
+
+// Met à jour un vol
+Route::put('/flies/{id}', [FlyController::class, 'update']);
+
+// Supprime un vol
+Route::delete('/flies/{id}', [FlyController::class, 'destroy']);
+
+Route::post('/flies/{id}/cancel', [FlyController::class, 'cancel']);

@@ -19,4 +19,11 @@ class Plane extends Model
         'max_place',
         'state',
     ];
+
+
+     // Relation avec Fly (vols opérés par cet avion)
+     public function flies()
+     {
+         return $this->hasMany(Fly::class, 'id_plane');
+     }
 }
