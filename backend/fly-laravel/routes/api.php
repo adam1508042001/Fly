@@ -52,13 +52,16 @@ Route::prefix('clients')->group(function () {
     Route::delete('/{id_client}', [ClientController::class, 'destroy']);
 });
 
-Route::prefix('bookings')->group(function () {
-    Route::get('/', [BookingController::class, 'index']);
-    Route::post('/', [BookingController::class, 'store']);
-    Route::get('/{id_booking}', [BookingController::class, 'show']);
-    Route::put('/{id_booking}', [BookingController::class, 'update']);
-    Route::patch('/{id_booking}', [BookingController::class, 'partialUpdate']);
-    Route::delete('/{id_booking}', [BookingController::class, 'destroy']);
-});
 
-Route::middleware('auth:sanctum')->post('/send-confirmation-email', [MailController::class, 'sendConfirmationEmail']);
+
+
+
+Route::prefix('bookings')->group(function () {
+
+    Route::get('/', [BookingController::class, 'index']); // Liste toutes les réservations
+    Route::post('/', [BookingController::class, 'store']); // Crée une nouvelle réservation
+    Route::get('/{id_booking}', [BookingController::class, 'show']); // Affiche une réservation spécifique
+    Route::put('/{id_booking}', [BookingController::class, 'update']); // Met à jour une réservation
+    Route::patch('/{id_booking}', [BookingController::class, 'partialUpdate']); // Mise à jour partielle
+    Route::delete('/{id_booking}', [BookingController::class, 'destroy']); // Supprime une réservation
+});
