@@ -74,15 +74,16 @@ Route::prefix('bookings')->group(function () {
 Route::get('/flies', [FlyController::class, 'index']);
 
 // Crée un vol (planification)
-Route::post('/flies', [FlyController::class, 'store']);
+Route::post('/flight', [FlyController::class, 'store']);
 
 // Détails d'un vol spécifique
 Route::get('/flies/{id}', [FlyController::class, 'show']);
 
-// Met à jour un vol
+// Mettre à jour un vol
 Route::put('/flies/{id}', [FlyController::class, 'update']);
 
 // Supprime un vol
 Route::delete('/flies/{id}', [FlyController::class, 'destroy']);
 
+//cancel un vol
 Route::post('/flies/{id}/cancel', [FlyController::class, 'cancel']);

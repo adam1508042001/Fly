@@ -21,9 +21,7 @@ class FlyController extends Controller
         return response()->json($flys);
     }
 
-    /**
-     * Crée un vol (planification).
-     */
+
    
 /**
  * Crée un vol (planification).
@@ -45,11 +43,7 @@ public function store(Request $request)
     $airportLanding = Airport::find($request->id_airport_landing);
     $airportFlyOff = Airport::find($request->id_airport_fly_off);
 
-    // Vérifier que l'avion n'a pas atteint sa capacité maximale
-    $existingBookingsCount = $plane->flies()->withCount('bookings')->get()->sum('bookings_count');
-    if ($existingBookingsCount >= $plane->max_place) {
-        return response()->json(['message' => 'The plane has reached its maximum capacity'], 400);
-    }
+
 
     // Récupérer les pistes des aéroports de décollage et d'atterrissage
     $runwayLanding = Runway::where('id_airport', $airportLanding->id_airport)->first();
@@ -74,20 +68,20 @@ public function store(Request $request)
         'id_airport_fly_off' => $request->id_airport_fly_off,
     ]);
 
-    // Mettre à jour le statut de l'avion en "active"
+    // Mettre à jour le statut de l'avion en "used"
     if ($plane) {
-        $plane->state = 'active'; // Par exemple : 'active' pour signaler que l'avion est en service
+        $plane->state = 'used'; // Par exemple : 'used' pour signaler que l'avion est en service
         $plane->save();
     }
 
     // Mettre à jour le statut des pistes associées
     if ($runwayLanding) {
-        $runwayLanding->state = 'inactive'; // Par exemple : 'inactive' pour signaler qu'elle est utilisée
+        $runwayLanding->state = 'used'; // Par exemple : 'used' pour signaler qu'elle est utilisée
         $runwayLanding->save();
     }
 
     if ($runwayFlyOff) {
-        $runwayFlyOff->state = 'inactive';
+        $runwayFlyOff->state = 'used';
         $runwayFlyOff->save();
     }
 
@@ -113,25 +107,114 @@ public function store(Request $request)
      * Met à jour un vol.
      */
     public function update(Request $request, $id)
-    {
-        $fly = Fly::find($id);
+{
+    $fly = Fly::with(['plane', 'airportLanding', 'airportFlyOff'])->find($id);
 
-        if (!$fly) {
-            return response()->json(['message' => 'Flight not found'], 404);
-        }
-
-        $request->validate([
-            'date_hour_landing' => 'date|after:date_hour_fly_off',
-            'date_hour_fly_off' => 'date|before:date_hour_landing',
-            'state' => 'string',
-            'id_plane' => 'exists:planes,id_plane',
-            'id_airport_landing' => 'exists:airports,id_airport',
-            'id_airport_fly_off' => 'exists:airports,id_airport',
-        ]);
-
-        $fly->update($request->all());
-        return response()->json($fly);
+    if (!$fly) {
+        return response()->json(['message' => 'Flight not found'], 404);
     }
+
+    // Vérification des restrictions
+    if ($fly->plane && $fly->plane->state === 'flying') {
+        return response()->json(['message' => 'Cannot modify a flight when the associated plane is already in flight.'], 400);
+    }
+
+    $timeToFlyOff = strtotime($fly->date_hour_fly_off) - time();
+    $timeToFlyOffMinutes = $timeToFlyOff / 60;
+
+    if ($timeToFlyOffMinutes <= 1) {
+        if ($request->has('date_hour_fly_off') || $request->has('date_hour_landing') ||
+            $request->has('id_plane') || $request->has('id_airport_fly_off') || $request->has('id_airport_landing')) {
+            return response()->json(['message' => 'Cannot modify flight information less than 1 minutes before departure.'], 400);
+        }
+    }
+
+    // Validation des données entrantes
+    $this->validateFlightData($request);
+
+    // Vérifier si l'avion ou les pistes sont disponibles
+    if ($request->has('id_plane')) {
+        $plane = Plane::find($request->id_plane);
+        if ($plane && $plane->state === 'flying') {
+            return response()->json(['message' => 'The selected plane is currently in flight.'], 400);
+        }
+    }
+
+    if ($request->has('id_airport_fly_off')) {
+        $runwayFlyOff = Runway::where('id_airport', $request->id_airport_fly_off)->first();
+        if ($runwayFlyOff && $runwayFlyOff->state === 'used') {
+            return response()->json(['message' => 'The runway at the departure airport is already in use.'], 400);
+        }
+    }
+
+    if ($request->has('id_airport_landing')) {
+        $runwayLanding = Runway::where('id_airport', $request->id_airport_landing)->first();
+        if ($runwayLanding && $runwayLanding->state === 'used') {
+            return response()->json(['message' => 'The runway at the landing airport is already in use.'], 400);
+        }
+    }
+
+    // Mise à jour du vol
+    $fly->update($request->all());
+
+    // Mise à jour des entités liées
+    $this->updateRelatedEntities($fly);
+
+    return response()->json($fly, 200);
+}
+
+/**
+ * Validation des données d'entrée.
+ */
+private function validateFlightData($request)
+{
+    $request->validate([
+        'date_hour_landing' => 'date|after:date_hour_fly_off',
+        'date_hour_fly_off' => 'date|before:date_hour_landing',
+        'state' => 'string',
+        'id_plane' => 'exists:planes,id_plane',
+        'id_airport_landing' => 'exists:airports,id_airport',
+        'id_airport_fly_off' => 'exists:airports,id_airport',
+    ]);
+}
+
+/**
+ * Met à jour les entités liées au vol.
+ */
+private function updateRelatedEntities(Fly $fly)
+{
+    // Mise à jour de l'état de l'avion
+    if ($fly->plane) {
+        $fly->plane->state = ($fly->state === 'Cancelled') ? 'landed' : 'used';
+        $fly->plane->save();
+    }
+
+    // Mise à jour des pistes des aéroports
+    $runwayFlyOff = Runway::where('id_airport', $fly->id_airport_fly_off)->first();
+    $runwayLanding = Runway::where('id_airport', $fly->id_airport_landing)->first();
+
+    if ($fly->state === 'Cancelled') {
+        if ($runwayFlyOff) {
+            $runwayFlyOff->state = 'not-used';
+            $runwayFlyOff->save();
+        }
+        if ($runwayLanding) {
+            $runwayLanding->state = 'not-used';
+            $runwayLanding->save();
+        }
+    } elseif ($fly->state === 'scheduled') {
+        if ($runwayFlyOff) {
+            $runwayFlyOff->state = 'used';
+            $runwayFlyOff->save();
+        }
+        if ($runwayLanding) {
+            $runwayLanding->state = 'used';
+            $runwayLanding->save();
+        }
+    }
+}
+
+     
 
 
 
@@ -180,12 +263,12 @@ public function cancel($id)
 
 
     if ($runwayLanding) {
-        $runwayLanding->state = 'active';
+        $runwayLanding->state = 'not-used';
         $runwayLanding->save();
     }
 
     if ($runwayFlyOff) {
-        $runwayFlyOff->state = 'active';
+        $runwayFlyOff->state = 'not-used';
         $runwayFlyOff->save();
     }
 

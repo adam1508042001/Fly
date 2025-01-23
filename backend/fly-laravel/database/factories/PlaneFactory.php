@@ -23,7 +23,7 @@ class PlaneFactory extends Factory
             'model' => $this->faker->word,  // Génère un nom de modèle aléatoire
             'size' => $this->faker->numberBetween(10, 100),  // Taille de l'avion aléatoire
             'max_place' => $this->faker->numberBetween(50, 300),  // Nombre de places maximum aléatoire
-            'state' => $this->faker->randomElement(['available', 'maintenance', 'unavailable']),  // État aléatoire
+            'state' => $this->faker->randomElement(['used', 'not-used', 'flying']),  // État aléatoire
         ];
     }
 }
