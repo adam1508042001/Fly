@@ -18,7 +18,7 @@ class RunwayFactory extends Factory
     public function definition(): array
     {
         return [
-            'state' => $this->faker->randomElement(['active', 'inactive', 'under maintenance']), // Etat de la piste
+            'state' => $this->faker->randomElement(['not-used', 'used', '']), // Etat de la piste
             'size' => $this->faker->numberBetween(1000, 5000), // Taille de la piste (en mètres)
             'id_airport' => Airport::inRandomOrder()->first()->id_airport,  // Aéroport auquel la piste appartient
         ];
