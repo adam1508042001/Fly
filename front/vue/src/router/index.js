@@ -3,13 +3,15 @@ import Login from '../views/Login.vue'
 import Signup from '../views/Signup.vue'
 import SearchFly from '../views/SearchFly.vue'
 import Reservation from '../views/Reservation.vue'
+import YourFlights from '../views/YourFlights.vue'
 
 const routes = [
-  { path: '/', redirect: '/search' },
+  { path: '/', redirect: '/login' },
   { path: '/login', component: Login },
   { path: '/signup', component: Signup },
   { path: '/search', component: SearchFly },
-  { path: '/reservation', component: Reservation }
+  { path: '/reservation', component: Reservation },
+  { path: '/your_flights', component: YourFlights }
 ]
 
 const router = createRouter({
