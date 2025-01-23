@@ -66,8 +66,6 @@ Route::prefix('bookings')->group(function () {
     Route::patch('/{id_booking}', [BookingController::class, 'partialUpdate']); // Mise à jour partielle
     Route::delete('/{id_booking}', [BookingController::class, 'destroy']); // Supprime une réservation
 });
-<<<<<<< HEAD
-=======
 
 
 
@@ -88,4 +86,3 @@ Route::put('/flies/{id}', [FlyController::class, 'update']);
 Route::delete('/flies/{id}', [FlyController::class, 'destroy']);
 
 Route::post('/flies/{id}/cancel', [FlyController::class, 'cancel']);
->>>>>>> route-create-fly
