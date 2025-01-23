@@ -1,0 +1,130 @@
+//le premier trigger 
+
+
+check_flight_conditions
+
+BEGIN
+    DECLARE runway_fly_off_size INT;
+    DECLARE runway_landing_size INT;
+    DECLARE plane_size INT;
+    DECLARE plane_state VARCHAR(50);
+    DECLARE runway_fly_off_state VARCHAR(50);
+    DECLARE runway_landing_state VARCHAR(50);
+
+    -- Récupérer la taille et l'état de la piste de décollage (fly-off) pour l'aéroport de départ
+    SELECT size, state INTO runway_fly_off_size, runway_fly_off_state
+    FROM runways
+    WHERE id_airport = NEW.id_airport_fly_off
+    LIMIT 1;
+
+    -- Vérifier si la piste de décollage existe
+    IF runway_fly_off_state IS NULL THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Fly-off runway not found for the specified airport.';
+    END IF;
+
+    -- Vérifier si la piste de décollage est active
+    IF runway_fly_off_state != 'not-used' THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'The runway at the fly-off airport is not available.';
+    END IF;
+
+    -- Récupérer la taille et l'état de la piste d'atterrissage (landing) pour l'aéroport d'arrivée
+    SELECT size, state INTO runway_landing_size, runway_landing_state
+    FROM runways
+    WHERE id_airport = NEW.id_airport_landing
+    LIMIT 1;
+
+    -- Vérifier si la piste d'atterrissage existe
+    IF runway_landing_state IS NULL THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Landing runway not found for the specified airport.';
+    END IF;
+
+    -- Vérifier si la piste d'atterrissage est active
+    IF runway_landing_state != 'not-used' THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'The runway at the landing airport is not available.';
+    END IF;
+
+    -- Récupérer les informations sur l'avion
+    SELECT size, state INTO plane_size, plane_state
+    FROM planes
+    WHERE id_plane = NEW.id_plane
+    LIMIT 1;
+
+    -- Vérifier si la taille de l'avion est compatible avec la piste de décollage
+    IF plane_size > runway_fly_off_size THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'The plane is too large for the runway at the fly-off airport.';
+    END IF;
+
+    -- Vérifier si la taille de l'avion est compatible avec la piste d'atterrissage
+    IF plane_size > runway_landing_size THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'The plane is too large for the runway at the landing airport.';
+    END IF;
+
+    -- Vérifier si l'avion est en état "landed"
+    IF plane_state != 'landed' THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'The plane is not in a landed state.';
+    END IF;
+
+END
+
+
+
+
+//le deuxieme trigger 
+
+
+update_flight_status
+
+BEGIN
+    -- Mettre à jour les avions en vol si l'heure de départ est atteinte et le vol est "Scheduled"
+    UPDATE planes
+    SET state = 'flying'
+    WHERE id_plane IN (
+        SELECT id_plane
+        FROM flys
+        WHERE date_hour_fly_off <= NOW() AND state = 'Scheduled'
+    );
+
+    -- Mettre à jour les pistes de décollage comme "not-used" après le départ
+    UPDATE runways
+    SET state = 'not-used'
+    WHERE id_airport IN (
+        SELECT id_airport_fly_off
+        FROM flys
+        WHERE date_hour_fly_off <= NOW() AND state = 'Scheduled'
+    );
+
+    -- Mettre à jour les vols à "Departed" après le décollage
+    UPDATE flys
+    SET state = 'Departed'
+    WHERE date_hour_fly_off <= NOW() AND state = 'Scheduled';
+
+    -- Mettre à jour les avions à "landed" si l'heure d'atterrissage est atteinte
+    UPDATE planes
+    SET state = 'landed'
+    WHERE id_plane IN (
+        SELECT id_plane
+        FROM flys
+        WHERE date_hour_landing <= NOW() AND state = 'Departed'
+    );
+
+    -- Mettre à jour les pistes d'atterrissage comme "not-used" après l'atterrissage
+    UPDATE runways
+    SET state = 'not-used'
+    WHERE id_airport IN (
+        SELECT id_airport_landing
+        FROM flys
+        WHERE date_hour_landing <= NOW() AND state = 'Departed'
+    );
+
+    -- Mettre à jour les vols à "Done" après l'atterrissage
+    UPDATE flys
+    SET state = 'Done'
+    WHERE date_hour_landing <= NOW() AND state = 'Departed';
+END
