@@ -249,7 +249,7 @@ export default {
 	},
 	async searchFlights() {
 		try {
-			const response = await axios.get('http://127.0.0.1:8000/api/filghts');
+			const response = await axios.get('http://127.0.0.1:8000/api/flies');
 			this.flights = response.data.filter(flight => {
 				return flight.airport_fly_off.city.toLowerCase().includes(this.departureQuery.toLowerCase()) &&
 					   flight.airport_landing.city.toLowerCase().includes(this.arrivalQuery.toLowerCase());
