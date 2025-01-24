@@ -1,22 +1,24 @@
 <template>
   <div class="modal-overlay" @click.self="closeModal">
-    <div class="modal-content">
-		<h2>Réserver un vol</h2>
-		<div>
-			<label for="nbPassengers">Nombre de passagers</label>
-			<input type="number" id="nbPassengers" v-model="nbPassengers" />
-		</div>
+    <div class="modal-content relative">
+      <h2 class="text-2xl font-bold mb-4">Réserver un vol</h2>
+      <div class="mb-4">
+        <label for="nbPassengers" class="block font-bold mb-2">Nombre de passagers</label>
+        <input type="number" id="nbPassengers" v-model.number="nbPassengers" class="block w-full px-4 py-2 rounded border border-gray-300 focus:outline-none focus:ring focus:ring-blue-500 focus:border-blue-500 shadow-sm" />
+      </div>
 
-		<div>
-			<button @click="confirmReservation">
-				Confirmer la réservation
-			</button>
-		</div>
+      <div class="mb-4 flex justify-center">
+        <button @click="confirmReservation" class="bg-blue-500 text-white py-2 px-4 rounded-full font-bold hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-300 transition-all">
+          Confirmer la réservation
+        </button>
+      </div>
 
-		<div>
-			<p>{{ nbPassengers * price }} €</p>
-		</div>
-      <button @click="closeModal">Fermer</button>
+      <div class="mb-4">
+        <p class="text-xl font-bold">{{ formattedTotalPrice }}</p>
+      </div>
+      <button @click="closeModal" class="absolute bottom-4 right-4 bg-red-500 text-white py-2 px-4 rounded-full font-bold hover:bg-red-600 focus:outline-none focus:ring focus:ring-red-300 transition-all">
+        Fermer
+      </button>
     </div>
   </div>
 </template>
@@ -40,6 +42,12 @@ export default {
       nbPassengers: 1
     };
   },
+  computed: {
+    formattedTotalPrice() {
+      const totalPrice = this.nbPassengers * this.price;
+      return isNaN(totalPrice) ? '0.00 €' : this.formatPrice(totalPrice);
+    }
+  },
   methods: {
     closeModal() {
       this.$emit('close');
@@ -56,7 +64,10 @@ export default {
         console.error('Erreur lors de l\'envoi de l\'email de confirmation:', error);
         alert('Une erreur est survenue lors de la confirmation de la réservation.');
       }
-    }
+    },
+    formatPrice(price) {
+      return price.toFixed(2) + ' €';
+    },
   }
 };
 </script>
@@ -82,5 +93,6 @@ export default {
 	border-radius: 8px;
 	width: 80%;
 	max-width: 600px;
+	position: relative;
 }
 </style>

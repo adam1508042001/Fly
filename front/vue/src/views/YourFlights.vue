@@ -1,5 +1,5 @@
 <template>
-	<div>
+	<div class="flex flex-col min-h-screen">
 		<NavBar />
 
 		<div class="grid items-center justify-center grid-cols-1 grid-rows-[150px_auto] bg-[#ffffff] bg-opacity-80 rounded-[30px] mx-10 my-5">
@@ -15,7 +15,7 @@
 			
 			<div class="mb-6">
 				<div v-for="(flight, index) in sortedFlights" :key="index" class="grid grid-cols-7 gap-4 mb-6">
-					<div>{{ flight.name }}</div>
+					<div>{{ generateFlightName(flight) }}</div>
 					<div>{{ flight.departureDate }}</div>
 					<div>{{ flight.arrivalDate }}</div>
 					<div>{{ flight.remainingPlaces }}</div>
@@ -73,7 +73,13 @@ export default {
 		},
 		openModal() {
 			this.showModal = true;
-		}
+		},
+		generateFlightName(flight) {
+			if (flight.airport_fly_off && flight.airport_landing) {
+				return `${flight.airport_fly_off.city} ${flight.airport_fly_off.name} -> ${flight.airport_landing.city} ${flight.airport_landing.name}`;
+			}
+			return 'Unknown Flight';
+		},
 	},
 	mounted() {
 		this.getFlights();

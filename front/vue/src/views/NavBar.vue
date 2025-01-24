@@ -34,18 +34,26 @@
         </router-link>
         <!-- Sign In Button -->
         <router-link to="/signup">
-          <button 
+          <button v-if="!isAuthenticated"
             class="signin bg-[#ffffff] bg-opacity-60 h-12 px-6 py-2 rounded-full border border-[#09147a] text-[#09147a] font-bold hover:bg-[#09147a] hover:text-white transition-all"
           >
             Sign In
           </button>
         </router-link>
 
-        <router-link to="/flights">
-          <button v-if="isAuthenticated"
+        <router-link to="/your_flights">
+          <button v-if="isAuthenticated && $route.path !== '/your_flights'"
             class="signin bg-[#ffffff] bg-opacity-60 h-12 px-6 py-2 rounded-full border border-[#09147a] text-[#09147a] font-bold hover:bg-[#09147a] hover:text-white transition-all"
           >
             Your Flights
+          </button>
+        </router-link>
+
+        <router-link to="/search">
+          <button v-if="isAuthenticated && $route.path !== '/search'"
+            class="signin bg-[#ffffff] bg-opacity-60 h-12 px-6 py-2 rounded-full border border-[#09147a] text-[#09147a] font-bold hover:bg-[#09147a] hover:text-white transition-all"
+          >
+            Search Fly
           </button>
         </router-link>
       </div>
@@ -54,12 +62,17 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import axios from 'axios';
 
 const isAuthenticated = ref(false);
 const router = useRouter();
+
+const checkAuth = () => {
+  const token = localStorage.getItem('token');
+  isAuthenticated.value = !!token;
+};
 
 const logout = () => {
   isAuthenticated.value = false;
@@ -76,6 +89,10 @@ const logout = () => {
     
   router.push('/login');
 };
+
+onMounted(() => {
+  checkAuth();
+});
 </script>
 
 <style scoped>

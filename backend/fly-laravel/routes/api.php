@@ -17,7 +17,7 @@ Route::prefix('auth')->group(function () {
     Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
 });
 
-Route::prefix('planes')->group(function () {
+Route::prefix('planes')->middleware('auth:sanctum')->group(function () {
     Route::get('/', [PlaneController::class, 'index']);
     Route::post('/', [PlaneController::class, 'store']);
     Route::get('/{id_plane}', [PlaneController::class, 'show']);
@@ -26,7 +26,7 @@ Route::prefix('planes')->group(function () {
     Route::patch('/{id_plane}', [PlaneController::class, 'patch']);
 });
 
-Route::prefix('airports')->group(function() {
+Route::prefix('airports')->middleware('auth:sanctum')->group(function() {
     Route::get('/', [AirportController::class, 'index']);
     Route::post('/', [AirportController::class, 'store']);
     Route::get('/{id_airport}', [AirportController::class, 'show']);
@@ -35,7 +35,7 @@ Route::prefix('airports')->group(function() {
     Route::patch('/{id_airport}', [AirportController::class, 'patch']);
 });
 
-Route::prefix('runways')->group(function () {
+Route::prefix('runways')->middleware('auth:sanctum')->group(function () {
     Route::get('/', [RunwayController::class, 'index']);
     Route::post('/', [RunwayController::class, 'store']);
     Route::get('/{id_runway}', [RunwayController::class, 'show']);
@@ -44,7 +44,7 @@ Route::prefix('runways')->group(function () {
     Route::patch('/{id_runway}', [RunwayController::class, 'partialUpdate']);
 });
 
-Route::prefix('clients')->group(function () {
+Route::prefix('clients')->middleware('auth:sanctum')->group(function () {
     Route::get('/', [ClientController::class, 'index']);
     Route::post('/', [ClientController::class, 'store']);
     Route::get('/{id_client}', [ClientController::class, 'show']);
@@ -53,36 +53,20 @@ Route::prefix('clients')->group(function () {
     Route::delete('/{id_client}', [ClientController::class, 'destroy']);
 });
 
-
-
-
-
-Route::prefix('bookings')->group(function () {
-
-    Route::get('/', [BookingController::class, 'index']); // Liste toutes les réservations
-    Route::post('/', [BookingController::class, 'store']); // Crée une nouvelle réservation
-    Route::get('/{id_booking}', [BookingController::class, 'show']); // Affiche une réservation spécifique
-    Route::put('/{id_booking}', [BookingController::class, 'update']); // Met à jour une réservation
-    Route::patch('/{id_booking}', [BookingController::class, 'partialUpdate']); // Mise à jour partielle
-    Route::delete('/{id_booking}', [BookingController::class, 'destroy']); // Supprime une réservation
+Route::prefix('bookings')->middleware('auth:sanctum')->group(function () {
+    Route::get('/', [BookingController::class, 'index']);
+    Route::post('/', [BookingController::class, 'store']);
+    Route::get('/{id_booking}', [BookingController::class, 'show']);
+    Route::put('/{id_booking}', [BookingController::class, 'update']);
+    Route::patch('/{id_booking}', [BookingController::class, 'partialUpdate']);
+    Route::delete('/{id_booking}', [BookingController::class, 'destroy']);
 });
 
-
-
-
-// Liste tous les vols
-Route::get('/flies', [FlyController::class, 'index']);
-
-// Crée un vol (planification)
-Route::post('/flies', [FlyController::class, 'store']);
-
-// Détails d'un vol spécifique
-Route::get('/flies/{id}', [FlyController::class, 'show']);
-
-// Met à jour un vol
-Route::put('/flies/{id}', [FlyController::class, 'update']);
-
-// Supprime un vol
-Route::delete('/flies/{id}', [FlyController::class, 'destroy']);
-
-Route::post('/flies/{id}/cancel', [FlyController::class, 'cancel']);
+Route::prefix('flies')->middleware('auth:sanctum')->group(function () {
+    Route::get('/flies', [FlyController::class, 'index']);
+    Route::post('/flies', [FlyController::class, 'store']);
+    Route::get('/flies/{id}', [FlyController::class, 'show']);
+    Route::put('/flies/{id}', [FlyController::class, 'update']);
+    Route::delete('/flies/{id}', [FlyController::class, 'destroy']);
+    Route::post('/flies/{id}/cancel', [FlyController::class, 'cancel']);
+});

@@ -5,19 +5,26 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class BookingController extends Controller
 {
-    // Liste toutes les réservations
     public function index()
     {
         $bookings = Booking::all();
         return response()->json($bookings, 200);
     }
 
-    // Crée une nouvelle réservation
     public function store(Request $request)
     {
+        // Vérifier si l'utilisateur est authentifié
+        $user = Auth::user();
+        Log::info('Authenticated user:', ['user' => $user]);
+        if (!$user) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
         $validated = $request->validate([
             'date_hour' => 'required|date_format:Y-m-d H:i:s',
             'place_reserved' => 'required|integer',
@@ -25,11 +32,19 @@ class BookingController extends Controller
             'suitcase_authorized' => 'required|boolean',
             'weight_authorized' => 'required|numeric',
             'id_fly' => 'required|exists:flys,id_fly',
-            'id_client' => 'required|exists:clients,id_client',
         ]);
 
-        $booking = Booking::create($validated);
-        return response()->json($booking, 201); // 201 Created
+        // Ajouter l'ID du client à la réservation
+        $validated['id_client'] = $user->id;
+        Log::info('Validated data with id_client:', $validated);
+
+        try {
+            $booking = Booking::create($validated);
+            return response()->json($booking, 201);
+        } catch (\Exception $e) {
+            Log::error('Error creating booking:', ['error' => $e->getMessage()]);
+            return response()->json(['message' => 'Internal Server Error'], 500);
+        }
     }
 
     // Affiche une réservation spécifique
