@@ -131,7 +131,7 @@ import NavBar  from './NavBar.vue';
 
     // Réinitialiser les champs après soumission du formulaire
     email.value = '';
-    password.value = '';
+    password.value = '';qqqqqq
   } catch (error) {
     console.error('Login failed:', error.response.data);
     errors.value.push('Login failed: ' + error.response.data.message);

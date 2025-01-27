@@ -102,7 +102,7 @@
 
 					<h3> Departure Date </h3>
 					
-					<h3>Arrival Date</h3>
+					<h3> Arrival Date </h3>
 
 					<h3> Remaining places </h3>
 
@@ -115,23 +115,32 @@
 
 				<!-- result -->
 				<div class="mb-6">
+					<div v-if="sortedFlights.length === 0">Aucun vol trouvé.</div>
 					<div v-for="(flight, index) in sortedFlights" :key="index" class="grid grid-cols-7 gap-4 mb-6">
-						<div>{{ flight.name }}</div>
-						<div>{{ flight.departureDate }}</div>
-						<div>{{ flight.arrivalDate }}</div>
-						<div>{{ flight.remainingPlaces }}</div>
-						<div>{{ flight.planeName }}</div>
-						<div>{{ flight.price }}</div>
+						<div>{{ generatedName(flight) }}</div>
+						<div>{{ flight.date_hour_fly_off }}</div>
+						<div>{{ flight.date_hour_landing }}</div>
+						<div>{{ getPlacesRemaining(flight) }}</div>
+						<div>{{ flight.plane.model }}</div>
+						<div>{{ flight.price || '0€' }}</div>
 						<div 
-							:class="{
-							'text-green-600 font-bold': flight.status.toLowerCase() === 'available',
-							'text-red-600 font-bold': flight.status.toLowerCase() === 'unavailable',
-							'text-orange-500 font-bold': flight.status.toLowerCase() === 'flying'
-							}"
+						:class="[
+									{
+										'text-green-600 font-bold': flight.state?.toLowerCase() === 'scheduled',
+										'text-red-600 font-bold': flight.state?.toLowerCase() === 'completed',
+										'text-orange-500 font-bold': flight.state?.toLowerCase() === 'delayed'
+									},
+									!flight.state ? 'text-gray-500' : ''
+								]"
 						>
-							{{ formatStatus(flight.status) }}
+							{{ formatState(flight.state) }}
 						</div>
-						<button @click="openModal(flight.price)">Réserver</button>
+						<button 
+							class="px-4 py-2 rounded-full bg-[#000000] text-[#ffffff] focus:outline-none focus:ring focus:ring-blue-500 focus:border-blue-500 shadow-sm"
+							@click="openModal(flight.price)"
+							>
+							Réserver
+						</button>
 					</div>
 				</div>
 			</div>
@@ -167,7 +176,7 @@ export default {
   },
   computed: {
 	sortedFlights() {
-		return this.flights.sort((a, b) => {
+		const sorted = this.flights.sort((a, b) => {
 			let modifier = this.sortOrder === 'asc' ? 1 : -1;
 			if (this.sortBy === 'price') {
 				return (a.price - b.price) * modifier;
@@ -181,17 +190,30 @@ export default {
 				return (new Date(a.arrivalDate) - new Date(b.arrivalDate)) * modifier;
 			}
 		});
+		console.log('Vols triés:', sorted);
+		return sorted;
 	}
   },
   methods: {
-    formatStatus(status) {
-      return status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
-    },
+	generatedName(flight) {
+		return `${flight.airport_fly_off.city} - ${flight.airport_landing.city}`;
+	},
+    formatState(state) {
+  		if (!state) return 'unknown';
+  		return state.charAt(0).toUpperCase() + state.slice(1).toLowerCase();
+	},
 	filterFlights(type) {
 		if (type === 'departure') {
 			const uniqueAirports = new Set();
 			this.filteredDepartureFlights = this.flights
-				.filter(flight => flight.airport_fly_off.city.toLowerCase().startsWith(this.departureQuery.toLowerCase()))
+				.filter(flight => {
+					const city = flight.airport_fly_off?.city;
+					if (city) {
+						console.log('Departure city:', city);
+						return city.toLowerCase().startsWith(this.departureQuery.toLowerCase());
+					}
+					return false;
+				})
 				.map(flight => {
 					const airport = {
 						city: flight.airport_fly_off.city,
@@ -208,7 +230,14 @@ export default {
 		if (type === 'arrival') {
 			const uniqueAirports = new Set();
 			this.filteredArrivalFlights = this.flights
-				.filter(flight => flight.airport_landing.city.toLowerCase().startsWith(this.arrivalQuery.toLowerCase()))
+				.filter(flight => {
+					const city = flight.airport_landing?.city;
+					if (city) {
+						console.log('Arrival city:', city);
+						return city.toLowerCase().startsWith(this.arrivalQuery.toLowerCase());
+					}
+					return false;
+				})
 				.map(flight => {
 					const airport = {
 						city: flight.airport_landing.city,
@@ -249,11 +278,25 @@ export default {
 	},
 	async searchFlights() {
 		try {
-			const response = await axios.get('http://127.0.0.1:8000/api/flies');
-			this.flights = response.data.filter(flight => {
-				return flight.airport_fly_off.city.toLowerCase().includes(this.departureQuery.toLowerCase()) &&
-					   flight.airport_landing.city.toLowerCase().includes(this.arrivalQuery.toLowerCase());
+			const token = localStorage.getItem('token');
+			const response = await axios.get('http://127.0.0.1:8000/api/flies', {
+				headers: {
+					Authorization: `Bearer ${token}`
+				}
 			});
+			console.log('Réponse de l\'API:', response.data);
+			this.flights = response.data.filter(flight => {
+				const departureCity = flight.airport_fly_off?.city;
+				const arrivalCity = flight.airport_landing?.city;
+				if (departureCity && arrivalCity) {
+					console.log('Departure city:', departureCity);
+					console.log('Arrival city:', arrivalCity);
+					return departureCity.toLowerCase().includes(this.departureQuery.toLowerCase()) &&
+						   arrivalCity.toLowerCase().includes(this.arrivalQuery.toLowerCase());
+				}
+				return false;
+			});
+			console.log('Vol filtrés:', this.flights);
 		} catch (error) {
 			console.error('Erreur lors de la récupération des vols:', error);
 		}
@@ -264,6 +307,24 @@ export default {
 	},
 	closeModal() {
 		this.showModal = false;
+	},
+	async getPlacesRemaining(flight) {
+		const token = localStorage.getItem('token');
+		const maxPlacesPlane = await axios.get('http://127.0.0.1:8000/api/planes', {
+			headers: {
+				Authorization: `Bearer ${token}`
+			}
+		});
+		const response = await axios.get('http://127.0.0.1:8000/api/bookings', {
+			headers: {
+				Authorization: `Bearer ${token}`
+			}
+		});
+		const flightId = flight.id;
+		const bookingsForFlight = response.data.filter(booking => booking.fly_id === flightId);
+		const placesTaken = bookingsForFlight.length;
+		const placesRemaining = maxPlacesPlane.data.find(plane => plane.id === flight.plane_id).max_places - placesTaken;
+		return placesRemaining;
 	}
   },
   async mounted() {

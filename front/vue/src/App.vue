@@ -1,15 +1,13 @@
 <template>
-  <div class="w-full h-full opacity-90">
-    <!-- Background -->
-    <div class="relative w-full h-screen">
-      <!-- Image de fond -->
-      <img src="./assets/bgimg.webp" alt="Background Image" class="absolute top-0 left-0 w-full h-full object-cover" />
+  <div class="app-container">
+    <!-- Background fixe -->
+    <div class="fixed-background">
+      <img src="./assets/bgimg.webp" alt="Background Image" class="bg-image" />
+    </div>
 
-      <!-- Contenu principal -->
-      <div class="relative z-10">
-        <!-- les composants -->
-        <router-view />
-      </div>
+    <!-- Container pour le contenu scrollable -->
+    <div class="content-container">
+      <router-view />
     </div>
   </div>
 </template>
@@ -19,11 +17,43 @@
 </script>
 
 <style scoped>
-/* Applique une hauteur correcte */
-html,
-body,
+.app-container {
+  position: relative;
+  min-height: 100vh;
+  width: 100%;
+}
+
+.fixed-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  z-index: -1;
+}
+
+.bg-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.9;
+}
+
+.content-container {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  z-index: 1;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow-x: hidden;
+}
+
 #app {
   height: 100%;
-  margin: 0;
 }
 </style>

@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\MailRequest;
 
 class MailController extends Controller
 {
@@ -25,7 +26,7 @@ class MailController extends Controller
         return response()->json(['message' => 'Email sent successfully to ' . $recipientEmail]);
     }
 
-    public function sendConfirmationEmail(Request $request)
+    public function sendConfirmationEmail(MailRequest $request)
     {
         Log::info('sendConfirmationEmail called');
         Log::info('Request data:', $request->all());

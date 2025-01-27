@@ -41,7 +41,7 @@
           </button>
         </router-link>
 
-        <router-link to="/flights">
+        <router-link to="/your_flights">
           <button v-if="isAuthenticated"
             class="signin bg-[#ffffff] bg-opacity-60 h-12 px-6 py-2 rounded-full border border-[#09147a] text-[#09147a] font-bold hover:bg-[#09147a] hover:text-white transition-all"
           >

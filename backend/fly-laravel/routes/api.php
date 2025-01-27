@@ -72,4 +72,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/{id}', [FlyController::class, 'destroy']);
         Route::post('/{id}/cancel', [FlyController::class, 'cancel']);
     });
+
+    Route::post('/mail/send', [MailController::class, 'sendConfirmationEmail']);
 });
