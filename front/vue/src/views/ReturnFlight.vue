@@ -102,7 +102,7 @@ export default {
 		},
 		async searchReturnFlights() {
 			try {
-				const response = await axios.get('http://127.0.0.1:8000/api/flights');
+				const response = await axios.get('http://127.0.0.1:8000/api/flies');
 				this.flights = response.data.filter(flight => {
 					return new Date(flight.departureDate) > new Date(this.confirmedFlight.arrivalDate) &&
 						   flight.airport_fly_off.city === this.confirmedFlight.airport_landing.city &&
