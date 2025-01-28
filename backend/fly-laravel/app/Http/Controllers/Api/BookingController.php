@@ -19,14 +19,16 @@ class BookingController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'date_hour' => 'required|date_format:Y-m-d H:i:s',
             'place_reserved' => 'required|integer',
             'state' => 'required|string|max:50',
-            'suitcase_authorized' => 'required|boolean',
-            'weight_authorized' => 'required|numeric',
+            'suitcase_authorized' => 'boolean',
+            'weight_authorized' => 'numeric',
             'id_fly' => 'required|exists:flys,id_fly',
             'id_client' => 'required|exists:clients,id_client',
         ]);
+
+        // Ajouter la date et l'heure actuelles
+        $validated['date_hour'] = now();
 
         $booking = Booking::create($validated);
         return response()->json($booking, 201); // 201 Created
@@ -44,28 +46,36 @@ class BookingController extends Controller
         return response()->json($booking, 200);
     }
 
+    
     // Met à jour une réservation
-    public function update(Request $request, $id_booking)
-    {
-        $booking = Booking::find($id_booking);
+public function update(Request $request, $id_booking)
+{
+    $booking = Booking::find($id_booking);
 
-        if (!$booking) {
-            return response()->json(['message' => 'Booking not found'], 404);
-        }
-
-        $validated = $request->validate([
-            'date_hour' => 'required|date_format:Y-m-d H:i:s',
-            'place_reserved' => 'required|integer',
-            'state' => 'required|string|max:50',
-            'suitcase_authorized' => 'required|boolean',
-            'weight_authorized' => 'required|numeric',
-            'id_fly' => 'required|exists:flys,id_fly',
-            'id_client' => 'required|exists:clients,id_client',
-        ]);
-
-        $booking->update($validated);
-        return response()->json($booking, 200);
+    if (!$booking) {
+        return response()->json(['message' => 'Booking not found'], 404);
     }
+
+    // Vérifie si le vol a déjà décollé
+    $fly = $booking->fly; // Assure-toi que la relation 'fly' est définie dans ton modèle Booking
+    if ($fly->state === 'departed') {
+        return response()->json(['message' => 'Cannot modify booking. The flight has already departed.'], 400);
+    }
+
+    // Validation des données
+    $validated = $request->validate([
+        'place_reserved' => 'required|integer',
+        'state' => 'required|string|max:50',
+        'suitcase_authorized' => 'required|boolean',
+        'weight_authorized' => 'required|numeric',
+        'id_fly' => 'required|exists:flys,id_fly',
+        'id_client' => 'required|exists:clients,id_client',
+    ]);
+
+    $booking->update($validated);
+    return response()->json($booking, 200);
+}
+
 
     // Mise à jour partielle (PATCH)
     public function partialUpdate(Request $request, $id_booking)

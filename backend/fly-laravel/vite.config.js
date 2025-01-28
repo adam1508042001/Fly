@@ -3,18 +3,11 @@ import laravel from 'laravel-vite-plugin';
 import vue from '@vitejs/plugin-vue';
 
 export default defineConfig({
-    plugins: [
-        laravel({
-            input: 'resources/js/app.js',
-            refresh: true,
-        }),
-        vue({
-            template: {
-                transformAssetUrls: {
-                    base: null,
-                    includeAbsolute: false,
-                },
-            },
-        }),
-    ],
+  plugins: [
+    laravel({
+      input: ['resources/css/app.css', 'resources/js/app.js'], // Spécifiez les fichiers CSS et JS ici
+      refresh: true,
+    }),
+    vue(),
+  ],
 });

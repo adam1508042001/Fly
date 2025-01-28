@@ -56,6 +56,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/{id_client}', [ClientController::class, 'destroy']);
     });
 
+
     Route::prefix('bookings')->group(function () {
         Route::get('/', [BookingController::class, 'index']);
         Route::post('/', [BookingController::class, 'store']);
@@ -64,6 +65,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::patch('/{id_booking}', [BookingController::class, 'partialUpdate']);
         Route::delete('/{id_booking}', [BookingController::class, 'destroy']);
     });
+
 
     Route::prefix('flies')->group(function () {
         Route::get('/', [FlyController::class, 'index']);
