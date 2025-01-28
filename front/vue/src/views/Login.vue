@@ -129,7 +129,6 @@ import NavBar  from './NavBar.vue';
 
     router.push('/search');
 
-    // Réinitialiser les champs après soumission du formulaire
     email.value = '';
     password.value = '';qqqqqq
   } catch (error) {
