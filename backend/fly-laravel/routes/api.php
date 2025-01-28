@@ -56,6 +56,15 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
 
+    Route::prefix('bookings')->group(function () {
+        Route::get('/', [BookingController::class, 'index']);
+        Route::post('/', [BookingController::class, 'store']);
+        Route::get('/{id_booking}', [BookingController::class, 'show']);
+        Route::put('/{id_booking}', [BookingController::class, 'update']);
+        Route::patch('/{id_booking}', [BookingController::class, 'partialUpdate']);
+        Route::delete('/{id_booking}', [BookingController::class, 'destroy']);
+    });
+
 
     Route::prefix('flies')->group(function () {
         Route::get('/', [FlyController::class, 'index']);

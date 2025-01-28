@@ -31,6 +31,11 @@ class Booking extends Model
     });
 }
 
+public function fly()
+{
+    return $this->belongsTo(Fly::class, 'id_fly');
+}
+
 }
 
 
