@@ -19,14 +19,16 @@ class BookingController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'date_hour' => 'required|date_format:Y-m-d H:i:s',
             'place_reserved' => 'required|integer',
             'state' => 'required|string|max:50',
-            'suitcase_authorized' => 'required|boolean',
-            'weight_authorized' => 'required|numeric',
+            'suitcase_authorized' => 'boolean',
+            'weight_authorized' => 'numeric',
             'id_fly' => 'required|exists:flys,id_fly',
             'id_client' => 'required|exists:clients,id_client',
         ]);
+
+        // Ajouter la date et l'heure actuelles
+        $validated['date_hour'] = now();
 
         $booking = Booking::create($validated);
         return response()->json($booking, 201); // 201 Created
@@ -44,7 +46,7 @@ class BookingController extends Controller
         return response()->json($booking, 200);
     }
 
-    // Met à jour une réservation
+    
     // Met à jour une réservation
 public function update(Request $request, $id_booking)
 {
