@@ -1,10 +1,9 @@
 <template>
-	<div class="modal-overlay" @click.self="closeModal">
-		<!-- Search box -->
-		<div class="modal-content">
-			<!-- head -->
+	<div class="flex flex-col min-h-screen">
+	  	<NavBar />
+	  	<div class="grid items-center justify-center grid-cols-1 grid-rows-[150px_100px_auto] bg-[#ffffff] bg-opacity-80 rounded-[30px] mx-10 my-5">
+		<!-- head -->
 			<div class="grid grid-cols-[5fr_1fr] grid-rows-1 p-8">
-				<!-- Title -->
 				<div class="text-start mb-6">
 					<h1 class="text-4xl font-bold text-center text-[#000000]">
 						A return flight ?
@@ -31,55 +30,56 @@
 
 			<!-- grid for results -->
 			<div class="mt-8 mx-8">
-				<!-- column title -->
-				<div class="grid grid-cols-7 gap-4 font-opacity-80 mb-6 pb-2 text-gray-500 border-b-2 border-gray-400">
-					<h3> Flight </h3>
-
-					<h3> Departure Date </h3>
-					
+				<div class="grid grid-cols-8 gap-4 font-opacity-80 mb-6 pb-2 text-gray-500 border-b-2 border-gray-400">
+					<h3>Flight</h3>
+					<h3>Departure Date</h3>
 					<h3>Arrival Date</h3>
-
-					<h3> Remaining places </h3>
-
-					<h3> Plane Name </h3>
-
-					<h3> Price </h3>
-
-					<h3> Status </h3>
+					<h3>Remaining places</h3>
+					<h3>Plane Name</h3>
+					<h3>Price</h3>
+					<h3>Status</h3>
 				</div>
-
-				<!-- result -->
+		
 				<div class="mb-6">
-					<div v-for="(flight, index) in sortedFlights" :key="index" class="grid grid-cols-7 gap-4 mb-6">
-						<div>{{ flight.name }}</div>
-						<div>{{ flight.departureDate }}</div>
-						<div>{{ flight.arrivalDate }}</div>
-						<div>{{ flight.remainingPlaces }}</div>
-						<div>{{ flight.planeName }}</div>
-						<div>{{ flight.price }}</div>
-						<div 
-							:class="{
-							'text-green-600 font-bold': flight.status.toLowerCase() === 'available',
-							'text-red-600 font-bold': flight.status.toLowerCase() === 'unavailable',
-							'text-orange-500 font-bold': flight.status.toLowerCase() === 'flying'
-							}"
+					<div v-if="sortedFlights.length === 0">No flights found.</div>
+					<div v-for="(flight, index) in sortedFlights" :key="index" class="grid grid-cols-8 gap-4 mb-6">
+					<div>{{ generatedName(flight) }}</div>
+					<div>{{ flight.date_hour_fly_off }}</div>
+					<div>{{ flight.date_hour_landing }}</div>
+					<div>{{ getPlacesRemaining(flight) || 'Loading...' }}</div>
+					<div>{{ flight.plane.model }}</div>
+					<div>{{ flight.price || '0€' }}</div>
+					<div 
+						:class="{
+						'text-green-600 font-bold': flight.state?.toLowerCase() === 'scheduled',
+						'text-red-600 font-bold': flight.state?.toLowerCase() === 'completed',
+						'text-orange-500 font-bold': flight.state?.toLowerCase() === 'delayed',
+						'text-gray-500': !flight.state
+						}"
+					>
+						{{ formatState(flight.state) }}
+					</div>
+					<button 
+						class="px-4 py-2 rounded-full bg-[#000000] text-[#ffffff] focus:outline-none focus:ring focus:ring-blue-500 focus:border-blue-500 shadow-sm"
+						@click="openModal(flight.price, flight.id_fly)"
 						>
-							{{ formatStatus(flight.status) }}
-						</div>
-						<button @click="openModal(flight.price)">Réserver</button>
+						Book
+					</button>
 					</div>
 				</div>
 			</div>
 		</div>
-		<Reservation v-if="showModal" :price="selectedPrice" @close="closeModal" />
 	</div>
 </template>
 
 <script>
+import NavBar from './NavBar.vue';
 import axios from 'axios';
-import Reservation from './Reservation.vue';
 
 export default {
+	components: {
+		NavBar
+	},
 	data() {
 		return {
 			showModal: false,
@@ -87,26 +87,38 @@ export default {
 			sortBy: 'price',
 			sortOrder: 'asc',
 			flights: [],
-			confirmedFlight: null
+			userBookings: []
 		};
 	},
 	methods: {
-		async getConfirmedFlight() {
+		async getUserBookings() {
 			try {
-				const response = await axios.get('http://127.0.0.1:8000/api/confirmed-flight'); // peut etre a changer selon la route et le controller
-				this.confirmedFlight = response.data;
+				const token = localStorage.getItem('token');
+				const response = await axios.get('http://127.0.0.1:8000/api/bookings', {
+					headers: {
+						Authorization: `Bearer ${token}`
+					}
+				});
+				this.userBookings = response.data.filter(booking => booking.id_client === this.userId);
 				this.searchReturnFlights();
 			} catch (error) {
-				console.error('Error while fetching confirmed flight:', error);
+				console.error('Error while fetching user bookings:', error);
 			}
 		},
 		async searchReturnFlights() {
 			try {
-				const response = await axios.get('http://127.0.0.1:8000/api/flies');
+				const token = localStorage.getItem('token');
+				const response = await axios.get('http://127.0.0.1:8000/api/flies', {
+					headers: {
+						Authorization: `Bearer ${token}`
+					}
+				});
 				this.flights = response.data.filter(flight => {
-					return new Date(flight.departureDate) > new Date(this.confirmedFlight.arrivalDate) &&
-						   flight.airport_fly_off.city === this.confirmedFlight.airport_landing.city &&
-						   flight.airport_landing.city === this.confirmedFlight.airport_fly_off.city;
+					return this.userBookings.some(booking => 
+						new Date(flight.date_hour_fly_off) > new Date(booking.id_fly.date_hour_landing) &&
+						flight.airport_fly_off.id_airport === booking.id_fly.airport_landing.id_airport &&
+						flight.airport_landing.id_airport === booking.id_fly.airport_fly_off.id_airport
+					);
 				});
 			} catch (error) {
 				console.error('Error while fetching return flights:', error);
@@ -149,8 +161,8 @@ export default {
 			});
 		}
 	},
-	mounted() {
-		this.getConfirmedFlight();
+	async mounted() {
+		await this.getUserBookings();
 	}
 };
 
