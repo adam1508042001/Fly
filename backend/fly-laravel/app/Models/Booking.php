@@ -12,7 +12,6 @@ class Booking extends Model
     protected $primaryKey = 'id_booking';
 
     protected $fillable = [
-        'date_hour',
         'place_reserved',
         'state',
         'suitcase_authorized',
@@ -20,4 +19,20 @@ class Booking extends Model
         'id_fly',
         'id_client',
     ];
+
+    protected static function boot()
+{
+    parent::boot();
+
+    static::creating(function ($booking) {
+        if (empty($booking->date_hour)) {
+            $booking->date_hour = now();
+        }
+    });
 }
+
+}
+
+
+
+
