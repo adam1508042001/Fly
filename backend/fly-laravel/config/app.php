@@ -1,6 +1,12 @@
 <?php
 
+use Barryvdh\DomPDF\Facade as PDF;
+use NunoMaduro\Collision\Provider;
+use Illuminate\Support\Facades\Facade;
+
 return [
+
+    
 
     /*
     |--------------------------------------------------------------------------
@@ -122,5 +128,8 @@ return [
         'driver' => env('APP_MAINTENANCE_DRIVER', 'file'),
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
+
+
+
 
 ];

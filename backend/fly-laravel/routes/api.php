@@ -10,6 +10,9 @@ use App\Http\Controllers\Api\RunwayController;
 use App\Http\Controllers\Api\MailController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Api\FlyController;
+use Illuminate\Support\Facades\View;
+
+
 
 Route::prefix('auth')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
@@ -76,5 +79,3 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/{id}/cancel', [FlyController::class, 'cancel']);
     });
 
-    Route::post('/mail/send', [MailController::class, 'sendConfirmationEmail']);
-});
