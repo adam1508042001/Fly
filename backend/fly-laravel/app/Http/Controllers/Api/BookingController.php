@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Booking;
 use Illuminate\Http\Request;
+
+use Barryvdh\DomPDF\Facade\Pdf;
+use App\Models\Booking;
 
 class BookingController extends Controller
 {
@@ -15,24 +17,36 @@ class BookingController extends Controller
         return response()->json($bookings, 200);
     }
 
-    // Crée une nouvelle réservation
     public function store(Request $request)
     {
+        // Validation des données de la réservation
         $validated = $request->validate([
             'place_reserved' => 'required|integer',
             'state' => 'required|string|max:50',
-            'suitcase_authorized' => 'boolean',
-            'weight_authorized' => 'numeric',
+            'suitcase_authorized' => 'nullable|boolean',
+            'weight_authorized' => 'nullable|numeric',
             'id_fly' => 'required|exists:flys,id_fly',
             'id_client' => 'required|exists:clients,id_client',
+            'email' => 'required|email',
         ]);
-
+    
         // Ajouter la date et l'heure actuelles
         $validated['date_hour'] = now();
-
+    
+        // Créer la réservation
         $booking = Booking::create($validated);
-        return response()->json($booking, 201); // 201 Created
+    
+        // Charger les relations pour avoir plus d'infos sur le client et le vol
+        $booking->load(['client', 'fly']); // Assurez-vous que ces relations existent dans votre modèle Booking
+    
+        // Générer le PDF à partir des données de réservation
+        $pdf = PDF::loadView('emails.booking_email', ['booking' => $booking]);
+    
+        // Retourner le PDF généré
+        return $pdf->download('reservation.pdf');
     }
+    
+    
 
     // Affiche une réservation spécifique
     public function show($id_booking)

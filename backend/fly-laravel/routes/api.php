@@ -10,6 +10,9 @@ use App\Http\Controllers\Api\RunwayController;
 use App\Http\Controllers\Api\MailController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Api\FlyController;
+use Illuminate\Support\Facades\View;
+
+
 
 Route::prefix('auth')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
@@ -74,6 +77,26 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/{id}', [FlyController::class, 'destroy']);
         Route::post('/{id}/cancel', [FlyController::class, 'cancel']);
     });
+
+
+
+Route::get('/test-email', function () {
+    if (!View::exists('emails.booking_email')) {
+        return response()->json(['error' => 'View not found'], 404);
+    }
+
+    return response()->json([
+        'message' => 'Vue trouvée avec succès',
+        'html' => view('emails.booking_email', ['booking' => (object) [
+            'id' => 1,
+            'place_reserved' => 2,
+            'state' => 'Confirmé',
+            'suitcase_authorized' => true,
+            'weight_authorized' => 20,
+            'date_hour' => now(),
+        ]])->render()
+    ]);
+});
 
 
 });
