@@ -124,14 +124,13 @@ import NavBar  from './NavBar.vue';
 
     console.log('Login successful:', response.data);
 
-    // Stocker le token dans le localStorage
     localStorage.setItem('token', response.data.access_token);
+    localStorage.setItem('email', email.value);
 
     router.push('/search');
 
-    // Réinitialiser les champs après soumission du formulaire
     email.value = '';
-    password.value = '';
+    password.value = '';qqqqqq
   } catch (error) {
     console.error('Login failed:', error.response.data);
     errors.value.push('Login failed: ' + error.response.data.message);

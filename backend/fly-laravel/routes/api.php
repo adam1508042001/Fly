@@ -18,6 +18,7 @@ Route::prefix('auth')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
     Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
+    Route::middleware('auth:sanctum')->get('/user', function (Request $request) { return $request->user(); });
 });
 
 
@@ -78,25 +79,3 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/{id}/cancel', [FlyController::class, 'cancel']);
     });
 
-
-
-Route::get('/test-email', function () {
-    if (!View::exists('emails.booking_email')) {
-        return response()->json(['error' => 'View not found'], 404);
-    }
-
-    return response()->json([
-        'message' => 'Vue trouvée avec succès',
-        'html' => view('emails.booking_email', ['booking' => (object) [
-            'id' => 1,
-            'place_reserved' => 2,
-            'state' => 'Confirmé',
-            'suitcase_authorized' => true,
-            'weight_authorized' => 20,
-            'date_hour' => now(),
-        ]])->render()
-    ]);
-});
-
-
-});

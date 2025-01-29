@@ -19,30 +19,32 @@
         <button class="px-3 hover:text-blue-500 transition-all">
           About Us
         </button>
-        <!-- Login Button -->
-        <router-link to="/login">
-          <button v-if="!isAuthenticated" 
+        <!-- Login/Logout Button -->
+        <router-link to="/login" v-if="!isAuthenticated">
+          <button 
             class="login h-12 px-6 py-2 mx-4 rounded-full bg-[#0004ff] border border-[#000000] text-[#ffffff] font-bold transition-all"
           >
             Login
           </button>
-          <button v-else @click="logout"
-            class="login h-12 px-6 py-2 mx-4 rounded-full bg-[#0004ff] border border-[#000000] text-[#ffffff] font-bold transition-all"
-          >
-            Logout
-          </button>
         </router-link>
+        <button v-else @click="logout"
+          class="login h-12 px-6 py-2 mx-4 rounded-full bg-[#0004ff] border border-[#000000] text-[#ffffff] font-bold transition-all"
+        >
+          Logout
+        </button>
+
         <!-- Sign In Button -->
-        <router-link to="/signup">
+        <router-link to="/signup" v-if="!isAuthenticated">
           <button 
             class="signin bg-[#ffffff] bg-opacity-60 h-12 px-6 py-2 rounded-full border border-[#09147a] text-[#09147a] font-bold hover:bg-[#09147a] hover:text-white transition-all"
           >
-            Sign In
+            Sign Up
           </button>
         </router-link>
 
-        <router-link to="/flights">
-          <button v-if="isAuthenticated"
+        <!-- Your Flights Button -->
+        <router-link to="/your_flights" v-if="isAuthenticated">
+          <button
             class="signin bg-[#ffffff] bg-opacity-60 h-12 px-6 py-2 rounded-full border border-[#09147a] text-[#09147a] font-bold hover:bg-[#09147a] hover:text-white transition-all"
           >
             Your Flights
@@ -54,30 +56,48 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import axios from 'axios';
 
 const isAuthenticated = ref(false);
 const router = useRouter();
 
-const logout = () => {
-  isAuthenticated.value = false;
-  
-  localStorage.removeItem('token');
-
-  axios.post('http://127.0.0.1:8000/api/auth/logout')
-    .then(response => {
-      console.log('Logged out successfully');
-    })
-    .catch(error => {
-      console.error('Error logging out:', error);
-    });
-    
-  router.push('/login');
+const checkAuth = async () => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    try {
+      await axios.get('http://127.0.0.1:8000/api/auth/user', {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      isAuthenticated.value = true;
+    } catch (error) {
+      console.error('Auth check failed:', error);
+      isAuthenticated.value = false;
+      localStorage.removeItem('token');
+    }
+  } else {
+    isAuthenticated.value = false;
+  }
 };
-</script>
 
-<style scoped>
-/* Ajoute des styles personnalisés ici si nécessaire */
-</style>
+const logout = async () => {
+  const token = localStorage.getItem('token');
+  try {
+    await axios.post('http://127.0.0.1:8000/api/auth/logout', {}, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+    isAuthenticated.value = false;
+    localStorage.removeItem('token');
+    router.push('/login');
+  } catch (error) {
+    console.error('Error logging out:', error);
+  }
+};
+
+onMounted(checkAuth);
+</script>

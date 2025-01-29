@@ -4,6 +4,7 @@ import Signup from '../views/Signup.vue'
 import SearchFly from '../views/SearchFly.vue'
 import Reservation from '../views/Reservation.vue'
 import YourFlights from '../views/YourFlights.vue'
+import ReturnFlight from '../views/ReturnFlight.vue'
 
 const routes = [
   { path: '/', redirect: '/login' },
@@ -11,7 +12,8 @@ const routes = [
   { path: '/signup', component: Signup },
   { path: '/search', component: SearchFly },
   { path: '/reservation', component: Reservation },
-  { path: '/your_flights', component: YourFlights }
+  { path: '/your-flights', component: YourFlights },
+  { path: '/return-flights', component: ReturnFlight }
 ]
 
 const router = createRouter({
