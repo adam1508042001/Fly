@@ -108,7 +108,7 @@
 			  <div>{{ generatedName(flight) }}</div>
 			  <div>{{ flight.date_hour_fly_off }}</div>
 			  <div>{{ flight.date_hour_landing }}</div>
-			  <div>{{ getPlacesRemaining(flight) || 'Loading...' }}</div>
+			  <div>{{ remainingPlacesMap[flight.id] }}</div>
 			  <div>{{ flight.plane.model }}</div>
 			  <div>{{ flight.price || '0€' }}</div>
 			  <div 
@@ -161,6 +161,7 @@
 		sortBy: 'price',
 		sortOrder: 'asc',
 		flights: [],
+		remainingPlacesMap: {},
 		showModal: false,
 		selectedPrice: 0,
 		selectedFlyId: null,
@@ -190,133 +191,167 @@
 	  }
 	},
 	methods: {
-	  generatedName(flight) {
-		return `${flight.airport_fly_off?.city || 'Unknown'} - ${flight.airport_landing?.city || 'Unknown'}`;
-	  },
-	  formatState(state) {
-		if (!state) return 'Unknown';
-		return state.charAt(0).toUpperCase() + state.slice(1).toLowerCase();
-	  },
-	  filterFlights(type) {
-		const query = type === 'departure' ? this.departureQuery : this.arrivalQuery;
-		const airportKey = type === 'departure' ? 'airport_fly_off' : 'airport_landing';
-		const uniqueAirports = new Set();
-  
-		const filtered = this.flights
-		  .filter(flight => {
-			const airport = flight[airportKey];
-			return airport?.city?.toLowerCase().includes(query.toLowerCase());
-		  })
-		  .map(flight => {
-			const airport = flight[airportKey];
-			const key = `${airport.city} - ${airport.name}`;
-			if (!uniqueAirports.has(key)) {
-			  uniqueAirports.add(key);
-			  return { city: airport.city, name: airport.name };
+		generatedName(flight) {
+			return `${flight.airport_fly_off?.city || 'Unknown'} - ${flight.airport_landing?.city || 'Unknown'}`;
+		},
+		formatState(state) {
+			if (!state) return 'Unknown';
+			return state.charAt(0).toUpperCase() + state.slice(1).toLowerCase();
+		},
+		filterFlights(type) {
+			const query = type === 'departure' ? this.departureQuery : this.arrivalQuery;
+			const airportKey = type === 'departure' ? 'airport_fly_off' : 'airport_landing';
+			const uniqueAirports = new Set();
+	
+			const filtered = this.flights
+			.filter(flight => {
+				const airport = flight[airportKey];
+				return airport?.city?.toLowerCase().includes(query.toLowerCase());
+			})
+			.map(flight => {
+				const airport = flight[airportKey];
+				const key = `${airport.city} - ${airport.name}`;
+				if (!uniqueAirports.has(key)) {
+				uniqueAirports.add(key);
+				return { city: airport.city, name: airport.name };
+				}
+				return null;
+			})
+			.filter(Boolean);
+	
+			if (type === 'departure') {
+			this.filteredDepartureFlights = filtered;
+			} else {
+			this.filteredArrivalFlights = filtered;
 			}
-			return null;
-		  })
-		  .filter(Boolean);
-  
-		if (type === 'departure') {
-		  this.filteredDepartureFlights = filtered;
-		} else {
-		  this.filteredArrivalFlights = filtered;
-		}
-	  },
-	  selectFlight(type, name) {
-		if (type === 'departure') {
-		  this.departureQuery = name;
-		  this.showDepartureDropdown = false;
-		} else {
-		  this.arrivalQuery = name;
-		  this.showArrivalDropdown = false;
-		}
-	  },
-	  hideDropdown(type) {
-		setTimeout(() => {
-		  if (type === 'departure') {
+		},
+		selectFlight(type, name) {
+			if (type === 'departure') {
+			this.departureQuery = name;
 			this.showDepartureDropdown = false;
-		  } else {
+			} else {
+			this.arrivalQuery = name;
 			this.showArrivalDropdown = false;
-		  }
-		}, 200);
-	  },
-	  toggleSortOrder() {
-		this.sortOrder = this.sortOrder === 'asc' ? 'desc' : 'asc';
-	  },
-	  async searchFlights() {
-		try {
-		  const token = localStorage.getItem('token');
-		  const response = await axios.get('http://127.0.0.1:8000/api/flies', {
-			headers: { Authorization: `Bearer ${token}` }
-		  });
-  
-		  this.flights = response.data.filter(flight => {
-			const departureMatch = !this.departureQuery || 
-			  flight.airport_fly_off?.city?.toLowerCase().includes(this.departureQuery.toLowerCase());
-			const arrivalMatch = !this.arrivalQuery || 
-			  flight.airport_landing?.city?.toLowerCase().includes(this.arrivalQuery.toLowerCase());
-			return departureMatch && arrivalMatch;
-		  });
-		  
-		} catch (error) {
-		  console.error('Error fetching flights:', error);
-		  alert('Error fetching flights. Please try again.');
-		}
-	  },
-	  async getCurrentUser() {
-		try {
-		const token = localStorage.getItem('token');
-		const response = await axios.get('http://127.0.0.1:8000/api/auth/user', {
-			headers: {
-				Authorization: `Bearer ${token}`
 			}
-		});
-		this.userId = response.data.id_client;
-		console.log('Current user:', response.data.id_client);
-		} catch (error) {
-		console.error('Erreur lors de la récupération de l\'utilisateur:', error);
-		}
-	},
-	async getPlacesRemaining(flight) {
-		const token = localStorage.getItem('token');
-		const maxPlacesPlane = await axios.get('http://127.0.0.1:8000/api/planes', {
-			headers: {
-				Authorization: `Bearer ${token}`
+		},
+		hideDropdown(type) {
+			setTimeout(() => {
+			if (type === 'departure') {
+				this.showDepartureDropdown = false;
+			} else {
+				this.showArrivalDropdown = false;
 			}
-		});
-		const response = await axios.get('http://127.0.0.1:8000/api/bookings', {
-			headers: {
-				Authorization: `Bearer ${token}`
+			}, 200);
+		},
+		toggleSortOrder() {
+			this.sortOrder = this.sortOrder === 'asc' ? 'desc' : 'asc';
+		},
+		async searchFlights() {
+			try {
+			const token = localStorage.getItem('token');
+			const response = await axios.get('http://127.0.0.1:8000/api/flies', {
+				headers: { Authorization: `Bearer ${token}` }
+			});
+	
+			this.flights = response.data.filter(flight => {
+
+				const departureCityQuery = this.departureQuery.split(' - ')[0].toLowerCase();
+				const arrivalCityQuery = this.arrivalQuery.split(' - ')[0].toLowerCase();
+
+				const departureMatch = !this.departureQuery || 
+				flight.airport_fly_off?.city?.toLowerCase().includes(departureCityQuery);
+				const arrivalMatch = !this.arrivalQuery || 
+				flight.airport_landing?.city?.toLowerCase().includes(arrivalCityQuery);
+
+				return departureMatch && arrivalMatch;
+			});
+
+			this.flights.forEach(flight => {
+				this.remainingPlacesMap[flight.id_fly] = 'Loading...';
+			});
+
+			await this.loadAllRemainingPlaces();
+			
+			} catch (error) {
+			console.error('Error fetching flights:', error);
+			alert('Error fetching flights. Please try again.');
 			}
-		});
-		const id_fly = flight.id;
-		const bookingsForFlight = response.data.filter(booking => booking.id_fly === id_fly);
-		const placesTaken = bookingsForFlight.length;
-		const placesRemaining = maxPlacesPlane.data.find(plane => plane.id === flight.plane_id).max_places - placesTaken;
-		return placesRemaining;
-	},
-	  openModal(price, fly_id) {
-		console.log('Opening modal with:', { price, fly_id });
-		if (!fly_id) {
-			console.error('No fly ID provided');
-			return;
+		},
+		async getCurrentUser() {
+			try {
+			const token = localStorage.getItem('token');
+			const response = await axios.get('http://127.0.0.1:8000/api/auth/user', {
+				headers: {
+					Authorization: `Bearer ${token}`
+				}
+			});
+			this.userId = response.data.id_client;
+			console.log('Current user:', response.data.id_client);
+			} catch (error) {
+			console.error('Erreur lors de la récupération de l\'utilisateur:', error);
+			}
+		},
+		async getPlacesRemaining(flight) {
+			try {
+				const token = localStorage.getItem('token');
+				const planesResponse = await axios.get('http://127.0.0.1:8000/api/planes', {
+				headers: {
+					Authorization: `Bearer ${token}`
+				}
+				});
+				const bookingsResponse = await axios.get('http://127.0.0.1:8000/api/bookings', {
+				headers: {
+					Authorization: `Bearer ${token}`
+				}
+				});
+				
+				const plane = planesResponse.data.find(p => p.id_plane == flight.plane.id_plane);
+
+				if (!plane) {
+					this.$set(this.remainingPlacesMap, flight.id_fly, 'N/A');
+					return;
+				}
+				
+				const bookingsForFlight = bookingsResponse.data.filter(booking => 
+					booking.id_fly === flight.id_fly
+				);
+
+				const maxPlaces = plane.max_place;
+				const placesTaken = bookingsForFlight.length;
+				const placesRemaining = maxPlaces - placesTaken;
+
+				this.remainingPlacesMap[flight.id_fly] = placesRemaining;
+
+				return placesRemaining;
+			} catch (error) {
+				console.error('Error getting remaining places:', error);
+        		this.remainingPlacesMap[flight.id_fly] = 'Error';
+			}
+		},
+		async loadAllRemainingPlaces() {
+			const promises = this.flights.map(flight => this.getPlacesRemaining(flight));
+      		await Promise.all(promises);
+		},
+		openModal(price, fly_id) {
+			console.log('Opening modal with:', { price, fly_id });
+			if (!fly_id) {
+				console.error('No fly ID provided');
+				return;
+			}
+			this.selectedPrice = price;
+			this.selectedFlyId = fly_id;
+			this.showModal = true;
+		},
+		closeModal() {
+			this.showModal = false;
+			this.searchFlights();
 		}
-		this.selectedPrice = price;
-		this.selectedFlyId = fly_id;
-		this.showModal = true;
-	  },
-	  closeModal() {
-		this.showModal = false;
-		this.searchFlights();
-	  }
 	},
 	async mounted() {
-	  await this.searchFlights();
-	  await this.getCurrentUser();
+		await this.searchFlights();
+		await this.getCurrentUser();
 	}
-  };
+};
 </script>
   
 <style>
